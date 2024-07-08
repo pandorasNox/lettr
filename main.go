@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"context"
 	"embed"
 	"errors"
 	"fmt"
@@ -22,6 +23,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/google/uuid"
+	"github.com/pandorasNox/lettr/pkg/github"
 	"github.com/pandorasNox/lettr/pkg/middleware"
 )
 
@@ -41,11 +43,12 @@ var fs embed.FS
 var ErrNotInWordList = errors.New("not in wordlist")
 
 type env struct {
-	port string
+	port        string
+	githubToken string
 }
 
 func (e env) String() string {
-	s := fmt.Sprintf("port: %s\n", e.port)
+	s := fmt.Sprintf("port: %s\ngithub token (length): %d\n", e.port, len(e.githubToken))
 	// s = s + fmt.Sprintf("foo: %s\n", e.port)
 	return s
 }
@@ -299,7 +302,7 @@ const (
 	MatchExact
 )
 
-type FormData struct {
+type TemplateDataForm struct {
 	Data                        puzzle
 	Errors                      map[string]string
 	IsSolved                    bool
@@ -313,11 +316,11 @@ type FormData struct {
 	SolutionHasDublicateLetters bool
 }
 
-func (fd FormData) New(l language, p puzzle, pastWords []word, SolutionHasDublicateLetters bool) FormData {
+func (fd TemplateDataForm) New(l language, p puzzle, pastWords []word, SolutionHasDublicateLetters bool) TemplateDataForm {
 	kb := keyboard{}
 	kb.Init(l, p.letterGuesses())
 
-	return FormData{
+	return TemplateDataForm{
 		Data:                        p,
 		Errors:                      make(map[string]string),
 		JSCachePurgeTimestamp:       time.Now().Unix(),
@@ -579,6 +582,7 @@ func main() {
 		"templates/index.html.tmpl",
 		"templates/lettr-form.html.tmpl",
 		"templates/help.html.tmpl",
+		"templates/suggest.html.tmpl",
 	))
 
 	mux := http.NewServeMux()
@@ -601,7 +605,7 @@ func main() {
 		p.Debug = sess.activeSolutionWord.String()
 		sessions.updateOrSet(sess)
 
-		fData := FormData{}.New(sess.language, p, sess.PastWords(), sess.activeSolutionWord.hasDublicateLetters())
+		fData := TemplateDataForm{}.New(sess.language, p, sess.PastWords(), sess.activeSolutionWord.hasDublicateLetters())
 		fData.IsSolved = p.isSolved()
 		fData.IsLoose = p.isLoose()
 
@@ -620,7 +624,7 @@ func main() {
 
 		p.Debug = s.activeSolutionWord.String()
 
-		fData := FormData{}.New(s.language, p, s.PastWords(), s.activeSolutionWord.hasDublicateLetters())
+		fData := TemplateDataForm{}.New(s.language, p, s.PastWords(), s.activeSolutionWord.hasDublicateLetters())
 		fData.IsSolved = p.isSolved()
 		fData.IsLoose = p.isLoose()
 
@@ -642,8 +646,11 @@ func main() {
 
 		err := r.ParseForm()
 		if err != nil {
-			// log.Fatalln(err)
 			log.Printf("error: %s", err)
+
+			w.WriteHeader(422)
+			w.Write([]byte("cannot parse form data"))
+			return
 		}
 
 		p := s.lastEvaluatedAttempt
@@ -671,7 +678,7 @@ func main() {
 		s.lastEvaluatedAttempt = p
 		sessions.updateOrSet(s)
 
-		fData := FormData{}.New(s.language, p, s.PastWords(), s.activeSolutionWord.hasDublicateLetters())
+		fData := TemplateDataForm{}.New(s.language, p, s.PastWords(), s.activeSolutionWord.hasDublicateLetters())
 		fData.IsSolved = p.isSolved()
 		fData.IsLoose = p.isLoose()
 
@@ -691,13 +698,12 @@ func main() {
 			l, _ = NewLang(maybeLang)
 			s.language = l
 
-			data := struct {
+			type TemplateDataLanguge struct {
 				Language language
-			}{
-				Language: l,
 			}
+			tData := TemplateDataLanguge{Language: l}
 
-			err := t.ExecuteTemplate(w, "oob-lang-switch", data)
+			err := t.ExecuteTemplate(w, "oob-lang-switch", tData)
 			if err != nil {
 				log.Printf("error t.ExecuteTemplate '/new' route: %s", err)
 			}
@@ -712,7 +718,7 @@ func main() {
 
 		p.Debug = s.activeSolutionWord.String()
 
-		fData := FormData{}.New(s.language, p, s.PastWords(), s.activeSolutionWord.hasDublicateLetters())
+		fData := TemplateDataForm{}.New(s.language, p, s.PastWords(), s.activeSolutionWord.hasDublicateLetters())
 		fData.IsSolved = p.isSolved()
 		fData.IsLoose = p.isLoose()
 
@@ -732,13 +738,60 @@ func main() {
 
 		p.Debug = s.activeSolutionWord.String()
 
-		fData := FormData{}.New(s.language, p, s.PastWords(), s.activeSolutionWord.hasDublicateLetters())
+		fData := TemplateDataForm{}.New(s.language, p, s.PastWords(), s.activeSolutionWord.hasDublicateLetters())
 		fData.IsSolved = p.isSolved()
 		fData.IsLoose = p.isLoose()
 
 		err := t.ExecuteTemplate(w, "help", fData)
 		if err != nil {
 			log.Printf("error t.ExecuteTemplate '/help' route: %s", err)
+		}
+	})
+
+	mux.HandleFunc("GET /suggest", func(w http.ResponseWriter, r *http.Request) {
+		err := t.ExecuteTemplate(w, "suggest", struct{}{})
+		if err != nil {
+			log.Printf("error t.ExecuteTemplate '/suggest' route: %s", err)
+		}
+	})
+
+	mux.HandleFunc("POST /suggest", func(w http.ResponseWriter, r *http.Request) {
+		err := r.ParseForm()
+		if err != nil {
+			log.Printf("error: %s", err)
+
+			w.WriteHeader(422)
+			w.Write([]byte("can not parse form data"))
+			return
+		}
+
+		form := r.PostForm
+		log.Printf("url values: %v\n", form)
+
+		title := fmt.Sprintf("new word suggestion: '%s'", form["word"][0])
+		ir := github.IssueRequest{Title: &title}
+		github.CreateIssue(context.Background(), envCfg.githubToken, ir)
+
+		type Message string
+
+		type TemplateDataMessages struct {
+			ErrMsgs     []Message
+			InfoMsgs    []Message
+			SuccessMsgs []Message
+		}
+
+		err = t.ExecuteTemplate(w, "oob-messages", TemplateDataMessages{
+			SuccessMsgs: []Message{"Suggestion was send, thank you!", "Happy riddling!"},
+			InfoMsgs:    []Message{"Words are mad up by letters", "Happy riddling!"},
+			ErrMsgs:     []Message{"Error", "Happy riddling!"},
+		})
+		if err != nil {
+			log.Printf("error t.ExecuteTemplate 'oob-messages' route: %s", err)
+		}
+
+		err = t.ExecuteTemplate(w, "suggest", struct{}{})
+		if err != nil {
+			log.Printf("error t.ExecuteTemplate '/suggest' route: %s", err)
 		}
 	})
 
@@ -783,7 +836,12 @@ func envConfig() env {
 		panic("PORT not provided")
 	}
 
-	return env{port}
+	gt, ok := os.LookupEnv("GITHUB_TOKEN")
+	if !ok {
+		panic("GITHUB_TOKEN not provided")
+	}
+
+	return env{port: port, githubToken: gt}
 }
 
 func handleSession(w http.ResponseWriter, req *http.Request, sessions *sessions, wdb wordDatabase) session {

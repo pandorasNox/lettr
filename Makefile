@@ -3,6 +3,10 @@
 cli:
 	./scripts/tools.sh cli
 
+.PHONY: setup
+setup:
+	./scripts/tools.sh setup
+
 .PHONY: watch
 watch:
 	./scripts/tools.sh watch

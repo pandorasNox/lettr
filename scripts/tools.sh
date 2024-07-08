@@ -16,7 +16,34 @@ fi
 
 # -----------------------------------------------------------------------------
 
-APP_PORT=9026
+# load .env file, if exists
+
+# if ! test -f ".env"; then
+#   echo ".env file expected but none found" 1>&2
+#   exit 1
+# fi
+
+if test -f ".env"; then
+  echo "loading .env file"
+  set -o allexport;
+  . ./.env; #source file
+  set +o allexport;
+fi
+
+# -----------------------------------------------------------------------------
+# check expected env vars (likely expected from .env file)
+
+func_check_expected_env_vars() {
+  if test "${GITHUB_TOKEN:-}" = ""; then
+    echo "WARNING: GITHUB_TOKEN expected, but is empty (not in .env file for local dev?)"
+  fi
+}
+
+func_check_expected_env_vars
+
+# -----------------------------------------------------------------------------
+
+APP_PORT=9026;
 
 # -----------------------------------------------------------------------------
 
@@ -48,6 +75,14 @@ func_cli() {
   fi
 
   docker exec -it ${CONTAINER_NAME} ash
+}
+
+func_setup() {
+  (
+    if (! test -f ".env") && test -f ".env.template" ; then
+      cp .env.template .env
+    fi
+  )
 }
 
 func_build_img() {
@@ -109,6 +144,7 @@ func_watch() {
     -v "${PWD}":"/workdir" \
     -p "${APP_PORT}":"${APP_PORT}" \
     -e PORT="${APP_PORT}" \
+    -e GITHUB_TOKEN="${GITHUB_TOKEN:?"No github token via GITHUB_TOKEN env variable provided"}" \
     --entrypoint=ash \
     "${DEVTOOLS_IMG_NAME}" -c "cd ./web/; npm install; cd ..; air --build.cmd 'cd ./web/ && npx tailwindcss --config app/tailwind.config.js --input app/css/input.css --output static/generated/output.css && npx tsc --project app/tsconfig.json && cd .. && go build -buildvcs=false -ldflags=\"-X 'main.Revision=$(git rev-parse --verify --short HEAD)' -X 'main.FaviconPath=/static/assets/favicon_dev'\" -o ./tmp/main' --build.bin './tmp/main' -build.include_ext 'go,tpl,tmpl,templ,html,js,ts,json,png,ico,webmanifest' -build.exclude_dir 'assets,tmp,vendor,web/node_modules,web/static/generated'"
 }
@@ -164,6 +200,11 @@ else
     if [ $1 == "cli" ]
     then
       func_cli
+    fi
+
+    if [ $1 == "setup" ]
+    then
+      func_setup
     fi
 
     if [ $1 == "watch" ]
