@@ -514,6 +514,14 @@ type keyboardKey struct {
 	Match  match
 }
 
+type Message string
+
+type TemplateDataMessages struct {
+	ErrMsgs     []Message
+	InfoMsgs    []Message
+	SuccessMsgs []Message
+}
+
 func Map[T, U any](ts []T, f func(T) U) []U {
 	us := make([]U, len(ts))
 	for i := range ts {
@@ -761,29 +769,39 @@ func main() {
 			log.Printf("error: %s", err)
 
 			w.WriteHeader(422)
-			w.Write([]byte("can not parse form data"))
+			err = t.ExecuteTemplate(w, "oob-messages", TemplateDataMessages{
+				ErrMsgs: []Message{"can not parse form data"},
+			})
+			if err != nil {
+				log.Printf("error t.ExecuteTemplate 'oob-messages': %s", err)
+			}
 			return
 		}
 
 		form := r.PostForm
 		log.Printf("url values: %v\n", form)
 
-		title := fmt.Sprintf("new word suggestion: '%s'", form["word"][0])
+		suggestedWord := form["word"][0]
+
+		if suggestedWord == "error" {
+			log.Println("artifical error triggered")
+
+			w.WriteHeader(422)
+			err = t.ExecuteTemplate(w, "oob-messages", TemplateDataMessages{
+				ErrMsgs: []Message{"artifical error triggered (with word 'error')"},
+			})
+			if err != nil {
+				log.Printf("error t.ExecuteTemplate 'oob-messages': %s", err)
+			}
+			return
+		}
+
+		title := fmt.Sprintf("new word suggestion: '%s'", suggestedWord)
 		ir := github.IssueRequest{Title: &title}
 		github.CreateIssue(context.Background(), envCfg.githubToken, ir)
 
-		type Message string
-
-		type TemplateDataMessages struct {
-			ErrMsgs     []Message
-			InfoMsgs    []Message
-			SuccessMsgs []Message
-		}
-
 		err = t.ExecuteTemplate(w, "oob-messages", TemplateDataMessages{
-			SuccessMsgs: []Message{"Suggestion was send, thank you!", "Happy riddling!"},
-			InfoMsgs:    []Message{"Words are mad up by letters", "Happy riddling!"},
-			ErrMsgs:     []Message{"Error", "Happy riddling!"},
+			SuccessMsgs: []Message{"Suggestion was send, thank you!"},
 		})
 		if err != nil {
 			log.Printf("error t.ExecuteTemplate 'oob-messages' route: %s", err)

@@ -27,6 +27,22 @@ interface CustomHtmxEvent<T = any> extends Event {
             document.addEventListener('htmx:afterSettle', (event: CustomHtmxEvent) => {reset(state, event)}, false);
             document.addEventListener('htmx:afterSettle', (event: CustomHtmxEvent) => {onErrorMsg(event)}, false);
             document.addEventListener('htmx:afterSettle', (event: CustomHtmxEvent) => {onMessages(event)}, false);
+
+
+
+            document.body.addEventListener('htmx:beforeSwap', function(evt: CustomHtmxEvent) {
+                if (evt.detail.xhr.status === 422) {
+                    console.log(evt);
+                    // allow 422 responses to swap as we are using this as a signal that
+                    // a form was submitted with bad data and want to rerender with the
+                    // errors
+                    //
+                    // set isError to false to avoid error logging in console
+                    evt.detail.shouldSwap = true;
+                    evt.detail.isError = true;
+                    //evt.detail.target = "messages";
+                }
+            });
         }, false);
 
         // document.body.addEventListener('htmx:load', function(evt) {
@@ -67,6 +83,7 @@ interface CustomHtmxEvent<T = any> extends Event {
         }
 
         const intervalID = setInterval(function() {
+            msgsContainer.innerHTML = '';
             msgsContainer.classList.remove("*:opacity-100");
             msgsContainer.classList.remove("*:translate-y-0");
             msgsContainer.classList.add("*:opacity-0");

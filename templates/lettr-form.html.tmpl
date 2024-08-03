@@ -1,6 +1,6 @@
 
 {{ define "lettr-form" }}
-  <div class="text-center" id="lettr-container" hx-ext="response-targets">  
+  <div class="text-center" id="lettr-container" >
     <h2 class="text-center">{{ if .IsSolved }}SOLVED{{ else if .IsLoose }}YOU LOOSE{{ else }}unsolved{{ end }}</h2>
     <div class="inline-block m-auto">
         <div>

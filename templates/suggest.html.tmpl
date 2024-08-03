@@ -20,7 +20,14 @@
 
 
 {{ define "suggest-form" }}
-<form name="suggestion" class="max-w-sm mx-auto" hx-post="/suggest" hx-target="#lettr-container">
+<form
+    name="suggestion"
+    class="max-w-sm mx-auto"
+
+    hx-post="/suggest"
+    hx-target="#lettr-container"
+    hx-target-error="#messages"
+>
 
   <fieldset class="mb-5">
     <legend class="block mb-2 text-sm font-medium text-gray-900 dark:text-white" >Pick language:</legend>
