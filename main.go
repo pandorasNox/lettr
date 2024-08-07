@@ -657,7 +657,12 @@ func main() {
 			log.Printf("error: %s", err)
 
 			w.WriteHeader(422)
-			w.Write([]byte("cannot parse form data"))
+			err = t.ExecuteTemplate(w, "oob-messages", TemplateDataMessages{
+				ErrMsgs: []Message{"cannot parse form data"},
+			})
+			if err != nil {
+				log.Printf("error t.ExecuteTemplate 'oob-messages': %s", err)
+			}
 			return
 		}
 
@@ -672,14 +677,24 @@ func main() {
 		// log.Printf("debug '/lettr' route - row compare: activeRow='%d' / formRowCount='%d' \n", s.lastEvaluatedAttempt.activeRow(), countFilledFormRows(r.PostForm))
 		if s.lastEvaluatedAttempt.activeRow() != countFilledFormRows(r.PostForm)-1 {
 			w.WriteHeader(422)
-			w.Write([]byte("faked rows"))
+			err = t.ExecuteTemplate(w, "oob-messages", TemplateDataMessages{
+				ErrMsgs: []Message{"faked rows"},
+			})
+			if err != nil {
+				log.Printf("error t.ExecuteTemplate 'oob-messages': %s", err)
+			}
 			return
 		}
 
 		p, err = parseForm(p, r.PostForm, s.activeSolutionWord, s.language, wordDb)
 		if err == ErrNotInWordList {
 			w.WriteHeader(422)
-			w.Write([]byte("word not in word list"))
+			err = t.ExecuteTemplate(w, "oob-messages", TemplateDataMessages{
+				ErrMsgs: []Message{"word not in word list"},
+			})
+			if err != nil {
+				log.Printf("error t.ExecuteTemplate 'oob-messages': %s", err)
+			}
 			return
 		}
 
@@ -782,32 +797,38 @@ func main() {
 		log.Printf("url values: %v\n", form)
 
 		suggestedWord := form["word"][0]
-
-		if suggestedWord == "error" {
-			log.Println("artifical error triggered")
-
-			w.WriteHeader(422)
-			err = t.ExecuteTemplate(w, "oob-messages", TemplateDataMessages{
-				ErrMsgs: []Message{"artifical error triggered (with word 'error')"},
-			})
-			if err != nil {
-				log.Printf("error t.ExecuteTemplate 'oob-messages': %s", err)
-			}
-			return
-		}
-
 		title := fmt.Sprintf("new word suggestion: '%s'", suggestedWord)
 		ir := github.IssueRequest{Title: &title}
-		github.CreateIssue(context.Background(), envCfg.githubToken, ir)
+		err = github.CreateIssue(context.Background(), envCfg.githubToken, ir)
 
-		err = t.ExecuteTemplate(w, "oob-messages", TemplateDataMessages{
-			SuccessMsgs: []Message{"Suggestion was send, thank you!"},
-		})
+		tdm := TemplateDataMessages{
+			SuccessMsgs: []Message{"Suggestion send, thank you!"},
+		}
+
+		type TemplateDataSuggest struct {
+			Word    string
+			Message string
+		}
+
+		tds := TemplateDataSuggest{}
+
+		if err != nil {
+			tdm = TemplateDataMessages{
+				ErrMsgs: []Message{"Could not send suggestion."},
+			}
+
+			tds = TemplateDataSuggest{
+				Word:    suggestedWord,
+				Message: "sdfsdfdfgdfg",
+			}
+		}
+
+		err = t.ExecuteTemplate(w, "oob-messages", tdm)
 		if err != nil {
 			log.Printf("error t.ExecuteTemplate 'oob-messages' route: %s", err)
 		}
 
-		err = t.ExecuteTemplate(w, "suggest", struct{}{})
+		err = t.ExecuteTemplate(w, "suggest", tds)
 		if err != nil {
 			log.Printf("error t.ExecuteTemplate '/suggest' route: %s", err)
 		}

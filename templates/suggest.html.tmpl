@@ -1,7 +1,7 @@
 
 {{ define "suggest" }}
     <section id="suggest" class="px-4 max-w-sm mx-auto">
-        <h2 class="text-center mb-6">your ad here</h2>
+        <h2 class="text-center">new suggestion</h2>
         <nav class="grid grid-cols-4 gap-4 items-center mb-5">
             <button
                 class="text-xs text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg px-3.5 py-1.5 dark:bg-gray-800 dark:text-white dark:border-gray-700 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
@@ -10,10 +10,9 @@
             >
                 <span>&lt; Back</span>
             </button>
-            <h2 class="col-span-2">new suggestion</h2>
         </nav>
-        <div class="container mb-1 text-left">
-          {{ template "suggest-form" }}
+        <div class="container mb-1 text-left">{{ .Word }}
+          {{ template "suggest-form" . }}
         </div>
     </section>
 {{ end }}
@@ -57,6 +56,7 @@
       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
       required maxlength="5"
       pattern="[A-Za-z]{5}"
+      value="{{ .Word }}"
     />
   </div>
 
@@ -84,7 +84,7 @@
       class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
       placeholder="Leave a comment... (reason why, meaning of the word, other related infos/remarks... MAX 280 characters allowed)"
       required maxlength="280"
-    ></textarea>
+    >static{{ .Message }}</textarea>
   </div>
 
   <input type="submit" value="send suggestion" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"/>
