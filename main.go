@@ -9,6 +9,7 @@ import (
 	"html/template"
 	"io"
 	"math/rand"
+	"regexp"
 	"strings"
 	"sync"
 	"unicode"
@@ -340,6 +341,21 @@ type TemplateDataSuggest struct {
 	Message  string
 	Language string
 	Action   string
+}
+
+var RegexpAllowedWordCharacters = regexp.MustCompile("/A-Za-zöäüÖÄÜß/")
+
+func (tds TemplateDataSuggest) validate() error {
+	_, err := toWord(tds.Word)
+	if err != nil {
+		return fmt.Errorf("validation failed: %s", err)
+	}
+
+	if !RegexpAllowedWordCharacters.Match([]byte(tds.Word)) {
+		return fmt.Errorf("validation failed: %s", "word contains forbidden characters")
+	}
+
+	return nil
 }
 
 type wordCollection string
@@ -806,10 +822,29 @@ func main() {
 		}
 
 		form := r.PostForm
-		log.Printf("url values: %v\n", form)
+		tds := TemplateDataSuggest{
+			Word:     form["word"][0],
+			Message:  form["message"][0],
+			Language: form["language-pick"][0],
+			Action:   form["suggest-action"][0],
+		}
+		err = tds.validate()
 
-		suggestedWord := form["word"][0]
-		title := fmt.Sprintf("new word suggestion: '%s'", suggestedWord)
+		if err != nil {
+			tdm := TemplateDataMessages{
+				ErrMsgs: []Message{Message(err.Error())},
+			}
+			err = t.ExecuteTemplate(w, "oob-messages", tdm)
+
+			if err != nil {
+				log.Printf("error t.ExecuteTemplate 'oob-messages' route: %s", err)
+			}
+
+			w.WriteHeader(422)
+			return
+		}
+
+		title := fmt.Sprintf("new word suggestion: '%s'", tds.Word)
 		ir := github.IssueRequest{Title: &title}
 		err = github.CreateIssue(context.Background(), envCfg.githubToken, ir)
 
@@ -817,18 +852,9 @@ func main() {
 			SuccessMsgs: []Message{"Suggestion send, thank you!"},
 		}
 
-		tds := TemplateDataSuggest{}
-
 		if err != nil {
 			tdm = TemplateDataMessages{
 				ErrMsgs: []Message{"Could not send suggestion."},
-			}
-
-			tds = TemplateDataSuggest{
-				Word:     suggestedWord,
-				Message:  form["message"][0],
-				Language: form["language-pick"][0],
-				Action:   form["suggest-action"][0],
 			}
 		}
 
