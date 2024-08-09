@@ -335,6 +335,13 @@ func (fd TemplateDataForm) New(l language, p puzzle, pastWords []word, SolutionH
 	}
 }
 
+type TemplateDataSuggest struct {
+	Word     string
+	Message  string
+	Language string
+	Action   string
+}
+
 type wordCollection string
 
 const (
@@ -777,7 +784,7 @@ func main() {
 	})
 
 	mux.HandleFunc("GET /suggest", func(w http.ResponseWriter, r *http.Request) {
-		err := t.ExecuteTemplate(w, "suggest", struct{}{})
+		err := t.ExecuteTemplate(w, "suggest", TemplateDataSuggest{})
 		if err != nil {
 			log.Printf("error t.ExecuteTemplate '/suggest' route: %s", err)
 		}
@@ -810,11 +817,6 @@ func main() {
 			SuccessMsgs: []Message{"Suggestion send, thank you!"},
 		}
 
-		type TemplateDataSuggest struct {
-			Word    string
-			Message string
-		}
-
 		tds := TemplateDataSuggest{}
 
 		if err != nil {
@@ -823,8 +825,10 @@ func main() {
 			}
 
 			tds = TemplateDataSuggest{
-				Word:    suggestedWord,
-				Message: "sdfsdfdfgdfg",
+				Word:     suggestedWord,
+				Message:  form["message"][0],
+				Language: form["language-pick"][0],
+				Action:   form["suggest-action"][0],
 			}
 		}
 
@@ -870,6 +874,9 @@ func main() {
 	for _, fm := range middlewares {
 		muxWithMiddlewares = fm(muxWithMiddlewares)
 	}
+
+	// v1 := http.NewServeMux()
+	// v1.Handle("/v1/", http.StripPrefix("/v1", muxWithMiddlewares))
 
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", envCfg.port), muxWithMiddlewares))
 }
