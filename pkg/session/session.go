@@ -73,33 +73,12 @@ func (s *session) SetLastEvaluatedAttempt(p puzzle.Puzzle) {
 	s.lastEvaluatedAttempt = p
 }
 
-type Sessions struct {
-	sessions []session
+func (s *session) GameState() *puzzle.GameState {
+	return &s.gameState
 }
 
-func NewSessions() Sessions {
-	return Sessions{}
-}
-
-func (ss Sessions) String() string {
-	out := ""
-	for _, s := range ss.sessions {
-		out = out + s.id + " " + s.expiresAt.String() + "\n"
-	}
-
-	return out
-}
-
-func (ss *Sessions) UpdateOrSet(sess session) {
-	index := slices.IndexFunc((ss.sessions), func(s session) bool {
-		return s.id == sess.id
-	})
-	if index == -1 {
-		ss.sessions = append(ss.sessions, sess)
-		return
-	}
-
-	(ss.sessions)[index] = sess
+func (s *session) SetGameState(g puzzle.GameState) {
+	s.gameState = g
 }
 
 func HandleSession(w http.ResponseWriter, req *http.Request, sessions *Sessions, wdb puzzle.WordDatabase) session {

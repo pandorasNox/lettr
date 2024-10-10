@@ -1,26 +1,7 @@
 package puzzle
 
-import "github.com/pandorasNox/lettr/pkg/language"
-
-type GameState struct {
-	puzzle             Puzzle
-	activeSolutionWord Word
-	letterHints        []rune
-}
-
 type Puzzle struct {
-	Debug   string
 	Guesses [6]WordGuess
-}
-
-func NewGame(l language.Language, wdb WordDatabase, excludeWords []Word) GameState {
-	newSolutionWord := wdb.RandomPickWithFallback(l, excludeWords, 0)
-
-	return GameState{
-		puzzle:             Puzzle{},
-		activeSolutionWord: newSolutionWord,
-		letterHints:        []rune{},
-	}
 }
 
 func (p Puzzle) ActiveRow() uint8 {

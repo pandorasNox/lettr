@@ -198,12 +198,10 @@ func main() {
 	mux.HandleFunc("GET /", func(w http.ResponseWriter, req *http.Request) {
 		sess := session.HandleSession(w, req, &sessions, wordDb)
 
-		p := sess.LastEvaluatedAttempt()
-		// log.Printf("debug '/' route - sess.LastEvaluatedAttempt():\n %v\n", wo)
-		p.Debug = sess.ActiveSolutionWord().String()
+		p := sess.GameState().LastEvaluatedAttempt()
 		sessions.UpdateOrSet(sess)
 
-		fData := TemplateDataForm{}.New(sess.Language(), p, sess.PastWords(), sess.ActiveSolutionWord().HasDublicateLetters(), envCfg.imprintUrl)
+		fData := TemplateDataForm{}.New(sess.Language(), p, sess.PastWords(), sess.GameState().ActiveSolutionWord().HasDublicateLetters(), envCfg.imprintUrl)
 		fData.IsSolved = p.IsSolved()
 		fData.IsLoose = p.IsLoose()
 
@@ -219,14 +217,17 @@ func main() {
 
 	mux.HandleFunc("GET /lettr", func(w http.ResponseWriter, r *http.Request) {
 		s := session.HandleSession(w, r, &sessions, wordDb)
-
-		p := s.LastEvaluatedAttempt()
-
 		sessions.UpdateOrSet(s)
 
-		p.Debug = s.ActiveSolutionWord().String()
+		p := s.GameState().LastEvaluatedAttempt()
 
-		fData := TemplateDataForm{}.New(s.Language(), p, s.PastWords(), s.ActiveSolutionWord().HasDublicateLetters(), envCfg.imprintUrl)
+		fData := TemplateDataForm{}.New(
+			s.Language(),
+			p,
+			s.PastWords(),
+			s.GameState().ActiveSolutionWord().HasDublicateLetters(),
+			envCfg.imprintUrl,
+		)
 		fData.IsSolved = p.IsSolved()
 		fData.IsLoose = p.IsLoose()
 
@@ -260,15 +261,15 @@ func main() {
 			return
 		}
 
-		p := s.LastEvaluatedAttempt()
-		p.Debug = s.ActiveSolutionWord().String()
+		g := s.GameState()
+		p := g.LastEvaluatedAttempt()
 
 		if p.IsSolved() || p.IsLoose() {
 			w.WriteHeader(204)
 			return
 		}
 
-		if s.LastEvaluatedAttempt().ActiveRow() != countFilledFormRows(r.PostForm)-1 {
+		if p.ActiveRow() != countFilledFormRows(r.PostForm)-1 {
 			w.WriteHeader(422)
 			notifier.AddError("faked rows")
 			err = t.ExecuteTemplate(w, "oob-messages", notifier.ToTemplate())
@@ -278,7 +279,7 @@ func main() {
 			return
 		}
 
-		p, err = parseForm(p, r.PostForm, s.ActiveSolutionWord(), s.Language(), wordDb)
+		p, err = parseForm(p, r.PostForm, g.ActiveSolutionWord(), s.Language(), wordDb)
 		if err == ErrNotInWordList {
 			w.WriteHeader(422)
 			notifier.AddError("word not in word list")
@@ -289,10 +290,11 @@ func main() {
 			return
 		}
 
-		s.SetLastEvaluatedAttempt(p)
+		g.SetLastEvaluatedAttempt(p)
+		s.SetGameState(*g) //todo move gamestate from pointer to copy
 		sessions.UpdateOrSet(s)
 
-		fData := TemplateDataForm{}.New(s.Language(), p, s.PastWords(), s.ActiveSolutionWord().HasDublicateLetters(), envCfg.imprintUrl)
+		fData := TemplateDataForm{}.New(s.Language(), p, s.PastWords(), g.ActiveSolutionWord().HasDublicateLetters(), envCfg.imprintUrl)
 		fData.IsSolved = p.IsSolved()
 		fData.IsLoose = p.IsLoose()
 
@@ -330,8 +332,6 @@ func main() {
 		s.SetActiveSolutionWord(wordDb.RandomPickWithFallback(l, s.PastWords(), 0))
 		s.NewGame(l, wordDb)
 		sessions.UpdateOrSet(s)
-
-		p.Debug = s.ActiveSolutionWord().String()
 
 		fData := TemplateDataForm{}.New(s.Language(), p, s.PastWords(), s.ActiveSolutionWord().HasDublicateLetters(), envCfg.imprintUrl)
 		fData.IsSolved = p.IsSolved()
