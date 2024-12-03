@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/pandorasNox/lettr/pkg/puzzle"
 	"github.com/pandorasNox/lettr/pkg/router"
@@ -50,6 +51,9 @@ func main() {
 	server := server.Server{}
 	sessions := session.NewSessions()
 
+	ticker := time.NewTicker(1 * time.Hour)
+	go cleanupSessions(ticker, &sessions)
+
 	wordDb := puzzle.WordDatabase{}
 	err := wordDb.Init(embedFs, puzzle.FilePathsByLang())
 	if err != nil {
@@ -88,4 +92,10 @@ func envConfig() env {
 	}
 
 	return env{port: port, githubToken: gt, imprintUrl: imprintUrl}
+}
+
+func cleanupSessions(ticker *time.Ticker, sesssions *session.Sessions) {
+	for range ticker.C {
+		sesssions.RemoveExpiredSessions()
+	}
 }
