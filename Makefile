@@ -1,4 +1,8 @@
 
+.PHONY: help
+help:
+	./scripts/tools.sh --help
+
 .PHONY: cli
 cli:
 	./scripts/tools.sh cli
@@ -38,6 +42,14 @@ img:
 .PHONY: tsc
 tsc:
 	./scripts/tools.sh tsc
+
+.PHONY: twind
+twind:
+	./scripts/tools.sh twind
+
+.PHONY: tailwind
+tailwind:
+	./scripts/tools.sh tailwind
 
 .PHONY: prod
 prod:
