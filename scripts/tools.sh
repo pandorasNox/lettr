@@ -47,20 +47,6 @@ APP_PORT=9026;
 
 # -----------------------------------------------------------------------------
 
-#   up                ...
-#   down              ...
-__usage="
-Usage: $(basename $0) [OPTIONS]
-
-Options:
-  --help|-h         show help
-  watch             start go server & reload server upon file chnages
-  test              start go docker container + run go tests
-  down              stop + delete all started local docker container
-"
-
-# -----------------------------------------------------------------------------
-
 DEVTOOLS_IMG_NAME=lettr_dev_tools
 PROD_IMG_NAME=lettr_prod
 CLI_CONTAINER_NAME=lettr_cli_con
@@ -193,10 +179,45 @@ func_typescript_build() {
   docker exec -t ${CONTAINER_NAME} ash -ce "cd ./web/; npm install; npx tsc --project app/tsconfig.json;"
 }
 
+func_tailwind_build() {
+  CONTAINER_NAME=${CLI_CONTAINER_NAME}
+
+  if ! (docker ps --format "{{.Names}}" | grep "${CLI_CONTAINER_NAME}"); then
+    func_build_img --img-name="${DEVTOOLS_IMG_NAME}" --target=builder-and-dev;
+
+    func_start_idle_container "${DEVTOOLS_IMG_NAME}" "${CONTAINER_NAME}"
+  fi
+
+  docker exec -t ${CONTAINER_NAME} ash -ce "cd ./web/; npm install; npx tailwindcss --config app/tailwind.config.js --input app/css/input.css --output static/generated/output.css;"
+}
+
 func_deploy() {
   fly deploy --build-arg "GIT_REVISION=$(git rev-parse --verify --short HEAD)"
 }
 
+# -----------------------------------------------------------------------------
+
+#   up                ...
+#   down              ...
+__usage="
+Usage: $(basename $0) [OPTIONS]
+
+Options:
+  --help|-h         show help
+  bench             start go docker container + run go bench tests
+  cli               start container + exec into
+  deploy            deploy app via fly cli-tool (flyctl) to fly.io (expects fl/flyctl clt-tool to be installed)
+  down              stop + delete all started local docker container
+  fmt               run gofmt across repo files
+  img               build all container images
+  prod              build prod container image + start container running on extra port (should be printed after start)
+  setup             setup .env file
+  skocli            via container provide skopeo tooling + exec into
+  test              start go docker container + run go tests
+  tsc               via container with typescript cli-tool build javascript assets
+  watch             via container start go server & reload server upon file chnages
+  wind              via container with tailwind cli-tool build css assets
+"
 # -----------------------------------------------------------------------------
 
 if [ -z "$*" ]
@@ -205,27 +226,32 @@ then
 else
     if [ $1 == "--help" ] || [ $1 == "-h" ]
     then
-        echo "$__usage"
+      echo "$__usage"
+      exit 0;
     fi
 
     if [ $1 == "cli" ]
     then
       func_cli
+      exit 0;
     fi
 
     if [ $1 == "setup" ]
     then
       func_setup
+      exit 0;
     fi
 
     if [ $1 == "fmt" ]
     then
       func_gofmt
+      exit 0;
     fi
 
     if [ $1 == "watch" ]
     then
       func_watch
+      exit 0;
     fi
 
     if [ $1 == "test" ]
@@ -233,41 +259,64 @@ else
       # func_exec_cli "go test -v ."
       func_exec_cli "go test -v ./..."
       # go test -run Test_HandleSession ./pkg/session
+      exit 0;
     fi
 
     if [ $1 == "bench" ]
     then
       func_exec_cli "go test -bench=. -run=^$ -cpu=1 -benchmem -count=10"
+      exit 0;
     fi
 
     if [ $1 == "down" ]
     then
       func_down
+      exit 0;
     fi
 
     if [ $1 == "skocli" ]
     then
       func_skopeo_cli
+      exit 0;
     fi
 
     if [ $1 == "img" ]
     then
       func_build_img --img-name="${DEVTOOLS_IMG_NAME}" --target=builder-and-dev;
       func_build_img --img-name="${PROD_IMG_NAME}" --target=prod;
+      exit 0;
     fi
 
     if [ $1 == "tsc" ]
     then
       func_typescript_build
+      exit 0;
+    fi
+
+    if [ $1 == "wind" ] || [ $1 == "tailwind" ]
+    then
+      func_tailwind_build
+      exit 0;
     fi
 
     if [ $1 == "prod" ]
     then
       func_start_prod
+      exit 0;
     fi
 
     if [ $1 == "deploy" ]
     then
       func_deploy
+      exit 0;
+    fi
+
+    if [ $1 != "" ]
+    then
+      echo "error: nor argument provided"
+
+      echo "$__usage"
+    
+      exit 1;
     fi
 fi
