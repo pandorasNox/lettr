@@ -52,9 +52,9 @@
     * [x] add imprint/link to imprint
     * [x] fix letter hints is not reset with new game bug
     * [x] add metrics endpoint
+    * [x] add scheduled RemoveExpiredSessions func (go routine in main.go)
     * [ ] tailwind check build succes (with files)
     * [ ] os.SIGNAL handling (gracefull server Shutdown)
-    * [ ] add scheduled RemoveExpiredSessions func (go routine in main.go)
 - nice-to-have
     * [x] option for double letter hint
     * [ ] Circuit Breaker Support
