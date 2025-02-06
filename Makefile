@@ -23,6 +23,10 @@ watch:
 test:
 	./scripts/tools.sh test
 
+.PHONY: check
+check:
+	./scripts/tools.sh check
+
 .PHONY: bench
 bench:
 	./scripts/tools.sh bench
