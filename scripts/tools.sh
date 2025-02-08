@@ -195,29 +195,6 @@ func_deploy() {
   fly deploy --build-arg "GIT_REVISION=$(git rev-parse --verify --short HEAD)"
 }
 
-func_prepend() {(
-  # echo "debug: func_prepend start" >&2;
-  _charAmount=${1:?'first argument should be amount of spaces'};
-  _char=${2:?'second argument should be a single character to repeat+prepend text with'};
-  _inputText=${3:?'second argument should be input text'};
-
-  # check _charAmount is positve integer expression
-  test "${_charAmount}" -eq "${_charAmount#-}" || (echo "error: first argument should be positve integer"; exit 1;);
-
-  # echo "debug: func_prepend => _inputText (before fill): ${_inputText}";
-  # _fill=$(printf ' %.0s' {1..${_charAmount}});
-  _fill=$( for ((i = 0; i < _charAmount; i++)); do printf "${_char}" ''; done );
-  # _fill="        ";
-  # printf '%s' "$(printf '%s' "${_inputText}" | awk "{print '${_fill}' $0}" )";
-  _res="$( printf '%s' "${_inputText}" | awk "{print \"${_fill}\" \$0}" )";
-  # echo "debug: func_prepend => _res (after fill): ${_res}" >&2;
-
-  printf '%s' "${_res}";
-
-  # echo "debug: func_prepend end" >&2
-)}
-export func_prepend;
-
 func_check() {
   echo "run func_check";
   CONTAINER_NAME=${CLI_CONTAINER_NAME}
@@ -228,28 +205,9 @@ func_check() {
     func_start_idle_container "${DEVTOOLS_IMG_NAME}" "${CONTAINER_NAME}"
   fi
 
-  _tw_stdout=$(docker exec -t ${CONTAINER_NAME} ash -ce \
-    "cd ./web/; npm install; npx tailwindcss --config app/tailwind.config.js --input app/css/input.css --output static/generated/output.css;" \
-  );
-    # | od -xc \
-
-
-  echo "before debug";
-  # echo "${_tw_stdout}" | grep "warn - No utility classes were detected in your source files";
-  # echo "${_tw_stdout}" | grep "w   a   r   n"
-  # echo "exit code: $?";
-  
-  # echo "DEBUG tailwind_out: \n${_tw_stdout}";
-  
-  # if !(echo "${_tw_stdout}" | grep "warn - No utility classes were detected in your source files"); then
-  # if (echo "${_tw_stdout}" | grep "w   a   r   n" > /dev/null); then
-  # if (echo "${_tw_stdout}" | grep "warn - No utility classes were detected in your source files" > /dev/null); then
-  if ( echo "${_tw_stdout}" | grep "warn" | grep "No utility classes were detected in your source files" > /dev/null ); then
-    echo "debug inside if";
-    printf 'error: found unwamnted warning in tailwind output\n  tailwindoutput:\n%s\n' "$( func_prepend "6" " " "$(func_prepend "4"  ">" "${_tw_stdout}" )" ) ";
-    echo "error: found unwamnted warning in tailwind output (see above)"
-    exit 1;
-  fi
+  docker exec -t ${CONTAINER_NAME} ash -ce \
+    "cd ./web/; npm install > /dev/null; ./../scripts/tailwind_build.sh" \
+  ;
 }
 
 # -----------------------------------------------------------------------------
