@@ -6,7 +6,7 @@ FROM golang:1.22.6-alpine AS builder-and-dev
 ARG GIT_REVISION=${GIT_REVISION}
 ENV GIT_REVISION=${GIT_REVISION}
 
-ENV WORKDIR /workdir
+ENV WORKDIR=/workdir
 WORKDIR ${WORKDIR}
 
 RUN apk add --no-cache \
@@ -14,7 +14,7 @@ RUN apk add --no-cache \
     tmux \
     || apk update && apk upgrade
 
-ENV AIR_VERSION 1.51.0
+ENV AIR_VERSION=1.51.0
 RUN go install github.com/cosmtrek/air@v${AIR_VERSION}
 
 RUN mkdir -p /scripts
