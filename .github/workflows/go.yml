@@ -40,7 +40,7 @@ jobs:
         (
           cd web;
           npm install;
-          npx tailwindcss --config app/tailwind.config.js --input app/css/input.css --output static/generated/output.css;
+          ./../scripts/tailwind_build.sh;
           npx tsc --project app/tsconfig.json;
         )
 
