@@ -17,8 +17,13 @@ RUN apk add --no-cache \
 ENV AIR_VERSION=1.51.0
 RUN go install github.com/cosmtrek/air@v${AIR_VERSION}
 
+# in root
 RUN mkdir -p /scripts
 COPY ./container-images/app/tmux.sh /scripts/tmux.sh
+
+# in workdir
+RUN mkdir -p "${WORKDIR}/scripts"
+COPY ./scripts/tailwind_build.sh "${WORKDIR}/scripts/tailwind_build.sh"
 
 # Copy Nodejs with dependencies from node image
 COPY --from=node /usr/lib /usr/lib
@@ -41,7 +46,7 @@ COPY ./web ./web
 
 RUN set -eu; \
     cd ${WORKDIR}/web/; \
-    npx tailwindcss --config app/tailwind.config.js --input app/css/input.css --output static/generated/output.css; \
+    ./../scripts/tailwind_build.sh; \
     npx tsc --project app/tsconfig.json; \
     cd ${WORKDIR}; \
     go build -buildvcs=false -o /tmp/lettr -ldflags="-X 'main.Revision=${GIT_REVISION}'";
