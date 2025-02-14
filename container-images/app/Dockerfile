@@ -1,5 +1,6 @@
 FROM node:20.12.1-alpine3.19 AS node
 
+# =============================================================
 
 FROM golang:1.22.6-alpine AS builder-and-dev
 
@@ -52,6 +53,12 @@ RUN set -eu; \
     go build -buildvcs=false -o /tmp/lettr -ldflags="-X 'main.Revision=${GIT_REVISION}'";
 
 ENTRYPOINT ["/usr/bin/env", "ash"]
+
+# =============================================================
+
+FROM builder-and-dev AS tester
+
+RUN go test -v ./...
 
 # =============================================================
 

@@ -82,12 +82,15 @@ func_gofmt() {(
 )}
 
 func_build_img() {
+  PROGRESS=
+
   # handle flags, see https://stackoverflow.com/a/22395652
   while test $# -gt 0 ; do
     # options with arguments
     case "$1" in
     --img-name=*) IMG_NAME="${1##--img-name=}" ; shift; continue; break ;;
     --target=*) TARGET="${1##--target=}" ; shift; continue; break ;;
+    --progress=*) PROGRESS="${1##--progress=}" ; shift; continue; break ;;
     esac
 
     # unknown - up to you - positional argument or error?
@@ -98,11 +101,17 @@ func_build_img() {
   IMG_NAME=${IMG_NAME:?"--img-name flag is missing, usage: --img-name=a-name"}
   TARGET=${TARGET:?"--target flag is missing, usage: --target=a-build-target"}
 
+  _progressArgs=""
+  if test -n "${PROGRESS}"; then
+    _progressArgs="--progress=${PROGRESS}"
+  fi
+
   docker build \
     -t "${IMG_NAME}" \
     -f container-images/app/Dockerfile \
     --target "${TARGET}" \
     --build-arg "GIT_REVISION=$(git rev-parse --verify --short HEAD)" \
+    ${_progressArgs} \
     .
 
   printf '%s' "${IMG_NAME}"
@@ -280,8 +289,9 @@ else
     if [ $1 == "test" ]
     then
       # func_exec_cli "go test -v ."
-      func_exec_cli "go test -v ./..."
+      # func_exec_cli "go test -v ./..."
       # go test -run Test_HandleSession ./pkg/session
+      func_build_img --img-name="${DEVTOOLS_IMG_NAME}" --target=tester --progress=plain;
       exit 0;
     fi
 
