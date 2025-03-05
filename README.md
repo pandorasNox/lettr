@@ -2,6 +2,15 @@
 
 # lettr
 
+## Disclaimer
+
+With regard to support, the maintainers of this repository are not obligated to provide assistance and likely never will.
+If you have received support in the past, consider it a rare and unlikely-to-be-repeated stroke of luck.
+For modifications, enhancements, or custom support, you are encouraged to fork the repository and make the necessary changes independently.
+Contributions via merge or pull requests are welcome, but please be aware that there is no guarantee they will be reviewed or merged.
+Treat this project as though it is effectively archived, even if it has not been officially labeled as such.
+While any contributions you make are appreciated, please lower and manage your expectations and keep them modest.
+
 ## known issues
 * If server restarts while playing, the next guess will end in a "fake rows" error. Resolved by reloading the page.
 
