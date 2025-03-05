@@ -66,6 +66,8 @@ While any contributions you make are appreciated, please lower and manage your e
     * [ ] os.SIGNAL handling (gracefull server Shutdown)
 - nice-to-have
     * [x] option for double letter hint
+    * [ ] move all tests and build etc to container image build and out of github workflow (so we only use the container build in the workflow)
+        * reason: making it more ci tool independant / easier to adapt in other ci tools
     * [ ] Circuit Breaker Support
     * [ ] pick word dataset picker
     * [ ] get definition (e.g. wikitionary)
