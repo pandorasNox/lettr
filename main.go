@@ -1,12 +1,16 @@
 package main
 
 import (
+	"context"
 	"embed"
+	"errors"
 	"fmt"
 	iofs "io/fs"
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/pandorasNox/lettr/pkg/puzzle"
@@ -51,8 +55,11 @@ func main() {
 	serverState := state.Server{}
 	sessions := session.NewSessions()
 
+	shutdownDoneChan := make(chan bool, 2)
+
+	quitScheduleChan := make(chan bool)
 	ticker := time.NewTicker(1 * time.Hour)
-	go cleanupSessions(ticker, &sessions)
+	go cleanupSessions(ticker, &sessions, quitScheduleChan, shutdownDoneChan)
 
 	wordDb := puzzle.WordDatabase{}
 	err := wordDb.Init(embedFs, puzzle.FilePathsByLang())
@@ -69,10 +76,41 @@ func main() {
 
 	router := router.New(staticFS, &serverState, &sessions, wordDb, envCfg.imprintUrl, envCfg.githubToken, Revision, FaviconPath)
 
-	// v1 := http.NewServeMux()
-	// v1.Handle("/v1/", http.StripPrefix("/v1", muxWithMiddlewares))
+	server := &http.Server{
+		Addr:    fmt.Sprintf(":%s", envCfg.port),
+		Handler: router,
+		// BaseContext: func(_ net.Listener) context.Context { return shutdownCtx },
+	}
 
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", envCfg.port), router))
+	go func() {
+		if err := server.ListenAndServe(); !errors.Is(err, http.ErrServerClosed) {
+			log.Fatalf("HTTP server error: %v", err)
+		}
+
+		// simulate time to close connections
+		time.Sleep(1 * time.Millisecond)
+
+		log.Println("Stopped serving new connections.")
+		shutdownDoneChan <- true
+	}()
+
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
+	<-sigChan
+
+	go func() { quitScheduleChan <- true }()
+
+	shutdownCtx, shutdownRelease := context.WithTimeout(context.Background(), 10*time.Second)
+	defer shutdownRelease()
+
+	if err := server.Shutdown(shutdownCtx); err != nil {
+		log.Fatalf("HTTP shutdown error: %v", err)
+	}
+
+	<-shutdownDoneChan
+	<-shutdownDoneChan
+
+	log.Println("Graceful shutdown complete.")
 }
 
 func envConfig() env {
@@ -94,8 +132,20 @@ func envConfig() env {
 	return env{port: port, githubToken: gt, imprintUrl: imprintUrl}
 }
 
-func cleanupSessions(ticker *time.Ticker, sesssions *session.Sessions) {
-	for range ticker.C {
-		sesssions.RemoveExpiredSessions()
+func cleanupSessions(ticker *time.Ticker, sesssions *session.Sessions, quitChan chan bool, shutdownDoneChan chan bool) {
+	for {
+		select {
+		case <-ticker.C:
+			sesssions.RemoveExpiredSessions()
+		case <-quitChan:
+			sesssions.RemoveExpiredSessions()
+			shutdownDoneChan <- true
+			return
+		default:
+			// do non-blocking select, as we can't know how long the ticker would block
+			// so we can wait for quitChan signal
+			// but also sleep to lighten cpu load from endless loop
+			time.Sleep(500 * time.Millisecond)
+		}
 	}
 }
