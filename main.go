@@ -72,7 +72,26 @@ func main() {
 	// v1 := http.NewServeMux()
 	// v1.Handle("/v1/", http.StripPrefix("/v1", muxWithMiddlewares))
 
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", envCfg.port), router))
+	
+
+	
+
+	go func() {
+        log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", envCfg.port), router))
+        log.Println("Stopped serving new connections.")
+    }()
+
+    sigChan := make(chan os.Signal, 1)
+    signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
+    <-sigChan
+
+    shutdownCtx, shutdownRelease := context.WithTimeout(context.Background(), 10*time.Second)
+    defer shutdownRelease()
+
+    if err := server.Shutdown(shutdownCtx); err != nil {
+        log.Fatalf("HTTP shutdown error: %v", err)
+    }
+    log.Println("Graceful shutdown complete.")
 }
 
 func envConfig() env {
