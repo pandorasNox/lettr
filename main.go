@@ -11,8 +11,8 @@ import (
 
 	"github.com/pandorasNox/lettr/pkg/puzzle"
 	"github.com/pandorasNox/lettr/pkg/router"
-	"github.com/pandorasNox/lettr/pkg/server"
 	"github.com/pandorasNox/lettr/pkg/session"
+	"github.com/pandorasNox/lettr/pkg/state"
 )
 
 var Revision = "0000000"
@@ -48,7 +48,7 @@ func main() {
 	log.Println("staring server...")
 
 	envCfg := envConfig()
-	server := server.Server{}
+	serverState := state.Server{}
 	sessions := session.NewSessions()
 
 	ticker := time.NewTicker(1 * time.Hour)
@@ -67,7 +67,7 @@ func main() {
 		log.Fatalf("subtree for 'static' dir of embed fs failed: %s", err) //TODO
 	}
 
-	router := router.New(staticFS, &server, &sessions, wordDb, envCfg.imprintUrl, envCfg.githubToken, Revision, FaviconPath)
+	router := router.New(staticFS, &serverState, &sessions, wordDb, envCfg.imprintUrl, envCfg.githubToken, Revision, FaviconPath)
 
 	// v1 := http.NewServeMux()
 	// v1.Handle("/v1/", http.StripPrefix("/v1", muxWithMiddlewares))
