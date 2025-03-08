@@ -10,8 +10,8 @@ import (
 	"github.com/pandorasNox/lettr/pkg/puzzle"
 	"github.com/pandorasNox/lettr/pkg/router/routes/models"
 	"github.com/pandorasNox/lettr/pkg/router/routes/templates"
-	"github.com/pandorasNox/lettr/pkg/server"
 	"github.com/pandorasNox/lettr/pkg/session"
+	"github.com/pandorasNox/lettr/pkg/state"
 )
 
 func GetSuggest(sessions *session.Sessions, wdb puzzle.WordDatabase) http.HandlerFunc {
@@ -29,7 +29,7 @@ func GetSuggest(sessions *session.Sessions, wdb puzzle.WordDatabase) http.Handle
 	}
 }
 
-func PostSuggest(githubToken string, sessions *session.Sessions, wdb puzzle.WordDatabase, server *server.Server) http.HandlerFunc {
+func PostSuggest(githubToken string, sessions *session.Sessions, wdb puzzle.WordDatabase, serverState *state.Server) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		notifier := notification.NewNotifier()
 		s := session.HandleSession(w, r, sessions, wdb)
@@ -58,7 +58,7 @@ func PostSuggest(githubToken string, sessions *session.Sessions, wdb puzzle.Word
 
 		isHoneypotFilled := form.Get("message") != ""
 		if isHoneypotFilled {
-			server.Metrics().IncreaseHoneyTrapped()
+			serverState.Metrics().IncreaseHoneyTrapped()
 			createSuccessResponse(w, &notifier)
 			return
 		}

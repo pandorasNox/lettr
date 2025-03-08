@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/pandorasNox/lettr/pkg/router/routes/templates"
-	"github.com/pandorasNox/lettr/pkg/server"
+	"github.com/pandorasNox/lettr/pkg/state"
 )
 
 type TemplateDataTestPage struct{}
@@ -22,7 +22,7 @@ func GetTestPage() http.HandlerFunc {
 	}
 }
 
-func PostIncrementHoneyTrapped(s *server.Server) http.HandlerFunc {
+func PostIncrementHoneyTrapped(s *state.Server) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		before := s.Metrics().HoneyTrapped()
 		s.Metrics().IncreaseHoneyTrapped()
