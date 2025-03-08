@@ -1,12 +1,16 @@
 package main
 
 import (
+	"context"
 	"embed"
 	"fmt"
 	iofs "io/fs"
 	"log"
+	"net"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/pandorasNox/lettr/pkg/puzzle"
@@ -72,26 +76,33 @@ func main() {
 	// v1 := http.NewServeMux()
 	// v1.Handle("/v1/", http.StripPrefix("/v1", muxWithMiddlewares))
 
-	
-
-	
+	// log.Fatal(testserver.ListenAndServe())
+	// ctx, cancel := context.WithCancel(context.Background())
+	httpServer := &http.Server{
+		Addr:        ":8080",
+		Handler:     mux,
+		BaseContext: func(_ net.Listener) context.Context { return ctx },
+	}
+	// httpServer.RegisterOnShutdown(cancel)
 
 	go func() {
-        log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", envCfg.port), router))
-        log.Println("Stopped serving new connections.")
-    }()
+		log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", envCfg.port), router))
+		log.Println("Stopped serving new connections.")
+	}()
 
-    sigChan := make(chan os.Signal, 1)
-    signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
-    <-sigChan
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
+	<-sigChan
 
-    shutdownCtx, shutdownRelease := context.WithTimeout(context.Background(), 10*time.Second)
-    defer shutdownRelease()
+	shutdownCtx, shutdownRelease := context.WithTimeout(context.Background(), 10*time.Second)
+	defer shutdownRelease()
 
-    if err := server.Shutdown(shutdownCtx); err != nil {
-        log.Fatalf("HTTP shutdown error: %v", err)
-    }
-    log.Println("Graceful shutdown complete.")
+	if err := httpServer.Shutdown(shutdownCtx); err != nil {
+		log.Fatalf("HTTP shutdown error: %v", err)
+	}
+	log.Println("Graceful shutdown complete.")
+
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", envCfg.port), router))
 }
 
 func envConfig() env {
