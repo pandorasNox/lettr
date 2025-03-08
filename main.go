@@ -3,10 +3,10 @@ package main
 import (
 	"context"
 	"embed"
+	"errors"
 	"fmt"
 	iofs "io/fs"
 	"log"
-	"net"
 	"net/http"
 	"os"
 	"os/signal"
@@ -73,36 +73,40 @@ func main() {
 
 	router := router.New(staticFS, &serverState, &sessions, wordDb, envCfg.imprintUrl, envCfg.githubToken, Revision, FaviconPath)
 
-	// v1 := http.NewServeMux()
-	// v1.Handle("/v1/", http.StripPrefix("/v1", muxWithMiddlewares))
-
-	// log.Fatal(testserver.ListenAndServe())
-	// ctx, cancel := context.WithCancel(context.Background())
-	httpServer := &http.Server{
-		Addr:        ":8080",
-		Handler:     mux,
-		BaseContext: func(_ net.Listener) context.Context { return ctx },
+	server := &http.Server{
+		Addr:    fmt.Sprintf(":%s", envCfg.port),
+		Handler: router,
+		// BaseContext: func(_ net.Listener) context.Context { return shutdownCtx },
 	}
-	// httpServer.RegisterOnShutdown(cancel)
+
+	shutdownChan := make(chan bool, 1)
 
 	go func() {
-		log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", envCfg.port), router))
+		if err := server.ListenAndServe(); !errors.Is(err, http.ErrServerClosed) {
+			log.Fatalf("HTTP server error: %v", err)
+		}
+
+		// simulate time to close connections
+		time.Sleep(1 * time.Millisecond)
+
 		log.Println("Stopped serving new connections.")
+		shutdownChan <- true
 	}()
 
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
 	<-sigChan
 
+	// todo: share context with sth like parent server ctx?
 	shutdownCtx, shutdownRelease := context.WithTimeout(context.Background(), 10*time.Second)
 	defer shutdownRelease()
 
-	if err := httpServer.Shutdown(shutdownCtx); err != nil {
+	if err := server.Shutdown(shutdownCtx); err != nil {
 		log.Fatalf("HTTP shutdown error: %v", err)
 	}
-	log.Println("Graceful shutdown complete.")
 
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", envCfg.port), router))
+	<-shutdownChan
+	log.Println("Graceful shutdown complete.")
 }
 
 func envConfig() env {
