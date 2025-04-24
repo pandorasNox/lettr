@@ -55,12 +55,6 @@ func main() {
 	serverState := state.Server{}
 	sessions := session.NewSessions()
 
-	shutdownDoneChan := make(chan bool, 2)
-
-	quitScheduleChan := make(chan bool)
-	ticker := time.NewTicker(1 * time.Hour)
-	go cleanupSessions(ticker, &sessions, quitScheduleChan, shutdownDoneChan)
-
 	wordDb := puzzle.WordDatabase{}
 	err := wordDb.Init(embedFs, puzzle.FilePathsByLang())
 	if err != nil {
@@ -82,6 +76,17 @@ func main() {
 		// BaseContext: func(_ net.Listener) context.Context { return shutdownCtx },
 	}
 
+	sigChan := make(chan os.Signal, 1)
+	shutdownDoneChan := make(chan bool, 2)
+
+	run(sigChan, shutdownDoneChan, server, sessions)
+}
+
+func run(sigChan chan os.Signal, shutdownDoneChan chan bool, server *http.Server, sessions session.Sessions) {
+	ticker := time.NewTicker(1 * time.Hour)
+	quitScheduleChan := make(chan bool)
+	go cleanupSessions(ticker, &sessions, quitScheduleChan, shutdownDoneChan)
+
 	go func() {
 		if err := server.ListenAndServe(); !errors.Is(err, http.ErrServerClosed) {
 			log.Fatalf("HTTP server error: %v", err)
@@ -94,7 +99,6 @@ func main() {
 		shutdownDoneChan <- true
 	}()
 
-	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
 	<-sigChan
 
