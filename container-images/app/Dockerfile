@@ -43,6 +43,7 @@ COPY ./pkg ./pkg
 RUN go mod download
 
 COPY ./main.go ./main.go
+COPY ./main_test.go ./main_test.go
 COPY ./configs ./configs
 COPY ./web ./web
 
