@@ -2,8 +2,13 @@ package main
 
 import (
 	iofs "io/fs"
+	"net/http"
+	"os"
 	"slices"
+	"syscall"
 	"testing"
+
+	"github.com/pandorasNox/lettr/pkg/session"
 )
 
 // todo: test for ???:
@@ -43,4 +48,31 @@ func getAllFilenames(efs iofs.FS) (files []string, err error) {
 	}
 
 	return files, nil
+}
+
+func Test_run(t *testing.T) {
+	type args struct {
+		sigChan          chan os.Signal
+		shutdownDoneChan chan bool
+		server           *http.Server
+		sessions         session.Sessions
+	}
+	tests := []struct {
+		name string
+		args args
+	}{
+		// test cases
+		{
+			args: args{
+				sigChan: make(chan os.Signal, 1),
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			run(tt.args.sigChan, tt.args.shutdownDoneChan, tt.args.server, tt.args.sessions)
+
+			tt.args.sigChan <- syscall.SIGTERM // keep in mind: this bypasses "signal.Notify" relay behaviour, on theory we can send anything here at this point
+		})
+	}
 }
