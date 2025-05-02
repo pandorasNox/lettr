@@ -92,9 +92,6 @@ func run(sigChan chan os.Signal, shutdownDoneChan chan bool, server *http.Server
 			log.Fatalf("HTTP server error: %v", err)
 		}
 
-		// simulate time to close connections
-		time.Sleep(1 * time.Millisecond)
-
 		log.Println("Stopped serving new connections.")
 		shutdownDoneChan <- true
 	}()
