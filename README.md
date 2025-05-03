@@ -63,9 +63,30 @@ While any contributions you make are appreciated, please lower and manage your e
     * [x] add metrics endpoint
     * [x] add scheduled RemoveExpiredSessions func (go routine in main.go)
     * [x] tailwind check build succes (with files)
-    * [ ] os.SIGNAL handling (gracefull server Shutdown)
+    * [x] os.SIGNAL handling (gracefull server Shutdown)
+        * main func testing
+            * https://stackoverflow.com/questions/31352239/how-to-test-the-main-package-functions
+    * [ ] self include unpack htmx javascript lib
+        * reasons:
+            * supply chain security
+                * don't trust external script sources, even so they are very very well known
+                * best example was the [polyfill incident](https://fossa.com/blog/polyfill-supply-chain-attack-details-fixes/)
+                * also: htmx repo probbably should be forked + synced with upstream
+                * + add renovate
+            * much more clean & professional to own it + allows customizations
+    * [ ] "someone" does not trust our tests, and with this bulletpoint solved would
+        * [ ] include browser based e2e tests e.g. playwright/cypress
+        * [ ] api tests?
+        * [ ] load tests?
+        * [ ] more unit tests?
+        * [ ] more integration tests? (e.g. go's testserver based tests)
 - nice-to-have
     * [x] option for double letter hint
+    * [x] auto updates via e.g. renovate
+        * [installing-onboarding](https://github.com/renovatebot/renovate/blob/0351bd5028d74de04a8a5de217f9864f49979b19/docs/usage/getting-started/installing-onboarding.md)
+    * [ ] more hints
+        * [ ] which lttrs are duplicats
+        * [ ] give next position of letter which wo do not have one yet
     * [ ] move all tests and build etc to container image build and out of github workflow (so we only use the container build in the workflow)
         * reason: making it more ci tool independant / easier to adapt in other ci tools
     * [ ] Circuit Breaker Support
