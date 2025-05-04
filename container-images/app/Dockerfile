@@ -2,7 +2,7 @@ FROM node:20.12.1-alpine3.19@sha256:7e227295e96f5b00aa79555ae166f50610940d888fc2
 
 # =============================================================
 
-FROM golang:1.22.6-alpine@sha256:1a478681b671001b7f029f94b5016aed984a23ad99c707f6a0ab6563860ae2f3 AS builder-and-dev
+FROM golang:1.24.2-alpine@sha256:7772cb5322baa875edd74705556d08f0eeca7b9c4b5367754ce3f2f00041ccee AS builder-and-dev
 
 ARG GIT_REVISION=${GIT_REVISION}
 ENV GIT_REVISION=${GIT_REVISION}
