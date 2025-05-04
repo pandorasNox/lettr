@@ -55,7 +55,7 @@ jobs:
     # - name: Test
     #   run: go test -v ./...
     - name: run test (via container build test target)
-      uses: docker/build-push-action@14487ce63c7a62a4a324b0bfb37086795e31c6c1 # v6
+      uses: docker/build-push-action@14487ce63c7a62a4a324b0bfb37086795e31c6c1 # v6.16.0
       with:
         context: .
         file: container-images/app/Dockerfile
@@ -70,7 +70,7 @@ jobs:
         version: v1.61.0
 
     - name: build the container image
-      uses: docker/build-push-action@14487ce63c7a62a4a324b0bfb37086795e31c6c1 # v6
+      uses: docker/build-push-action@14487ce63c7a62a4a324b0bfb37086795e31c6c1 # v6.16.0
       with:
         context: .
         file: container-images/app/Dockerfile
