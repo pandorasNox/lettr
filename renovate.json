@@ -5,5 +5,12 @@
     "config:best-practices",
     ":pinDependencies"
   ],
-  "configMigration": true
+  "configMigration": true,
+  "packageRules": [
+    {
+      "matchDatasources": ["docker", "gomod", "github-actions"],
+      "matchPackageNames": ["golang", "go"],
+      "groupName": "golangVersionUpdate"
+    }
+  ]
 }
