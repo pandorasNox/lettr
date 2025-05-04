@@ -82,8 +82,11 @@ While any contributions you make are appreciated, please lower and manage your e
         * [ ] more integration tests? (e.g. go's testserver based tests)
 - nice-to-have
     * [x] option for double letter hint
-    * [ ] auto updates via e.g. renovate
+    * [x] auto updates via e.g. renovate
         * [installing-onboarding](https://github.com/renovatebot/renovate/blob/0351bd5028d74de04a8a5de217f9864f49979b19/docs/usage/getting-started/installing-onboarding.md)
+    * [ ] more hints
+        * [ ] which lttrs are duplicats
+        * [ ] give next position of letter which wo do not have one yet
     * [ ] move all tests and build etc to container image build and out of github workflow (so we only use the container build in the workflow)
         * reason: making it more ci tool independant / easier to adapt in other ci tools
     * [ ] Circuit Breaker Support
