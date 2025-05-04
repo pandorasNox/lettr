@@ -23,7 +23,7 @@ jobs:
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
 
     - name: Setup Node.js environment
-      uses: actions/setup-node@0a44ba7841725637a19e28fa30b79a866c81b0a6 # v4.0.4
+      uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
       with:
         #node-version: 20.12.1
         # File containing the version Spec of the version to use.  Examples: package.json, .nvmrc, .node-version, .tool-versions.
