@@ -1,8 +1,8 @@
-FROM node:20.12.1-alpine3.19 AS node
+FROM node:20.12.1-alpine3.19@sha256:7e227295e96f5b00aa79555ae166f50610940d888fc2e321cf36304cbd17d7d6 AS node
 
 # =============================================================
 
-FROM golang:1.22.6-alpine AS builder-and-dev
+FROM golang:1.22.6-alpine@sha256:1a478681b671001b7f029f94b5016aed984a23ad99c707f6a0ab6563860ae2f3 AS builder-and-dev
 
 ARG GIT_REVISION=${GIT_REVISION}
 ENV GIT_REVISION=${GIT_REVISION}
@@ -62,7 +62,7 @@ RUN go test -v ./...
 
 # =============================================================
 
-FROM alpine:3.19 AS prod
+FROM alpine:3.19@sha256:e5d0aea7f7d2954678a9a6269ca2d06e06591881161961ea59e974dff3f12377 AS prod
 
 COPY --from=builder-and-dev /tmp/lettr /usr/local/bin/
 
