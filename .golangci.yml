@@ -1,8 +1,34 @@
 # yaml-language-server: $schema=https://golangci-lint.run/jsonschema/golangci.jsonschema.json
 # $schema: "https://golangci-lint.run/jsonschema/golangci.jsonschema.json"
 
+## v1
+#linters:
+#  disable:
+#    - "gofumpt"
+#  presets:
+#    - "format"
+
+version: "2"
 linters:
-  disable:
-    - "gofumpt"
-  presets:
-    - "format"
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+formatters:
+  enable:
+    - gci
+    - gofmt
+    - goimports
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
