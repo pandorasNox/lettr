@@ -1,5 +1,7 @@
 package puzzle
 
+import "github.com/pandorasNox/lettr/pkg/assert"
+
 type Puzzle struct {
 	Guesses [6]WordGuess
 }
@@ -87,43 +89,40 @@ type LetterGuess struct {
 
 func EvaluateGuessedWord(guessedWord Word, solutionWord Word) WordGuess {
 	solutionWord = solutionWord.ToLower()
-	guessedLetterCountMap := make(map[rune]int)
+	solutionLettersCountMap := make(map[rune]int) // Tracks letter counts in solution
+	guessEvaluation := WordGuess{}
 
-	resultWordGuess := WordGuess{}
+	// Count letter occurrences in solution word
+	for _, char := range solutionWord {
+		solutionLettersCountMap[char]++
+	}
 
-	// initilize
-	for i, gr := range guessedWord {
-		resultWordGuess[i].Letter = gr
-		resultWordGuess[i].Match = MatchNone
+	// initilize resultWordGuess
+	for i, guessLetter := range guessedWord {
+		guessEvaluation[i].Letter = guessLetter
+		guessEvaluation[i].Match = MatchNone
 	}
 
 	// mark exact matches
-	for i, gr := range guessedWord {
-		exact := solutionWord[i] == gr
-
-		if exact {
-			guessedLetterCountMap[gr]++
-			resultWordGuess[i].Match = MatchExact
+	for i, guessLetter := range guessedWord {
+		if solutionWord[i] == guessLetter {
+			guessEvaluation[i].Match = MatchExact
+			solutionLettersCountMap[guessLetter]--
 		}
 	}
 
-	// mark some/vague matches
-	for i, gr := range guessedWord {
-		if resultWordGuess[i].Match == MatchExact {
+	// mark vague matches
+	for i, guessLetter := range guessedWord {
+		if guessEvaluation[i].Match == MatchExact {
 			continue
 		}
+		assert.Assert(guessEvaluation[i].Match == MatchNone, "guessedWord letter match entry should be None")
 
-		some := solutionWord.Contains(gr)
-
-		if !(resultWordGuess[i].Match == MatchVague) || some {
-			guessedLetterCountMap[gr]++
-		}
-
-		s := some && (guessedLetterCountMap[gr] <= solutionWord.Count(gr))
-		if s {
-			resultWordGuess[i].Match = MatchVague
+		if solutionLettersCountMap[guessLetter] > 0 {
+			guessEvaluation[i].Match = MatchVague
+			solutionLettersCountMap[guessLetter]--
 		}
 	}
 
-	return resultWordGuess
+	return guessEvaluation
 }

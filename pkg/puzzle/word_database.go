@@ -49,7 +49,7 @@ func (wdb *WordDatabase) Init(fs iofs.FS, filePathsByLanguage map[language.Langu
 				}
 
 				scanner := bufio.NewScanner(f)
-				var line int = 0
+				line := 0
 				for scanner.Scan() {
 					if line == 0 { // skip first metadata line
 						line++

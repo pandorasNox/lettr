@@ -43,6 +43,10 @@ skocli:
 img:
 	./scripts/tools.sh img
 
+.PHONY: lint
+lint:
+	./scripts/tools.sh lint
+
 .PHONY: tsc
 tsc:
 	./scripts/tools.sh tsc
