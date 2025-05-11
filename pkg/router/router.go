@@ -11,10 +11,6 @@ import (
 	"github.com/pandorasNox/lettr/pkg/session"
 )
 
-type Router struct {
-	mux http.ServeMux
-}
-
 func New(staticFS iofs.FS, server *server.Server, sessions *session.Sessions, wordDb puzzle.WordDatabase, imprintUrl string, githubToken string, revision string, faviconPath string) http.Handler {
 	mux := http.NewServeMux()
 

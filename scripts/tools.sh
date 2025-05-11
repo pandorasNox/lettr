@@ -219,6 +219,24 @@ func_check() {
   ;
 }
 
+func_lint() {(
+  echo "run golangci-lint";
+
+  CONTAINER_NAME=golangci/golangci-lint:v2.1.6-alpine;
+
+  docker run -t --rm \
+    --entrypoint=ash \
+    -w /workdir \
+    -v "$(pwd)":/workdir \
+    -v golanglint-go-build-cache-vol:/root/.cache/go-build \
+    -v golanglint-go-root-vol:/usr/local/go \
+    -v golanglint-go-mod-cache-vol:/go/pkg/mod \
+    -v golanglint-lint-cache-vol:/root/.cache/golangci-lint \
+    ${CONTAINER_NAME} \
+    -ce "golangci-lint run --config ./.golangci.yml -v" \
+  ;
+)}
+
 # -----------------------------------------------------------------------------
 
 #   up                ...
@@ -235,6 +253,7 @@ Options:
   down              stop + delete all started local docker container
   fmt               run gofmt across repo files
   img               build all container images
+  lint              run golangci-lint via docker container
   prod              build prod container image + start container running on extra port (should be printed after start)
   setup             setup .env file
   skocli            via container provide skopeo tooling + exec into
@@ -317,6 +336,12 @@ else
     then
       func_build_img --img-name="${DEVTOOLS_IMG_NAME}" --target=builder-and-dev;
       func_build_img --img-name="${PROD_IMG_NAME}" --target=prod;
+      exit 0;
+    fi
+
+    if [ $1 == "lint" ]
+    then
+      func_lint;
       exit 0;
     fi
 

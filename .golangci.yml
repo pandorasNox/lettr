@@ -21,6 +21,9 @@ linters:
       - third_party$
       - builtin$
       - examples$
+      # custom paths
+      - tmp/
+      - bin/
 formatters:
   enable:
     - gci

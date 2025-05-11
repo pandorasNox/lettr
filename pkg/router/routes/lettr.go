@@ -116,7 +116,7 @@ func PostLettr(sessions *session.Sessions, wdb puzzle.WordDatabase, imprintUrl s
 func countFilledFormRows(postPuzzleForm url.Values) uint8 {
 	isfilled := func(row []string) bool {
 		emptyButWithLen := make([]string, len(row)) // we need empty slice but with right elem length
-		return !(slices.Compare(row, emptyButWithLen) == 0)
+		return slices.Compare(row, emptyButWithLen) != 0
 	}
 
 	var count uint8 = 0
