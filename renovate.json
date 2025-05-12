@@ -8,7 +8,7 @@
   "configMigration": true,
   "packageRules": [
     {
-      "matchPackageNames": ["golang", "go"],
+      "matchDatasources": ["golang-version"],
       "groupName": "golangVersionUpdate"
     }
   ]
