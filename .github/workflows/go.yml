@@ -25,7 +25,7 @@ jobs:
     - name: Setup Node.js environment
       uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
       with:
-        #node-version: 20.12.1
+        #node-version: 22.15.0
         # File containing the version Spec of the version to use.  Examples: package.json, .nvmrc, .node-version, .tool-versions.
         node-version-file: ./web/package.json
         # Target architecture for Node to use. Examples: x86, x64. Will use system architecture by default.
