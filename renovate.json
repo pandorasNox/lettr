@@ -12,6 +12,12 @@
       "groupName": "golangVersionUpdate"
     },
     {
+      "matchManagers": ["gomod"],
+      "matchDepNames": ["go"],
+      "matchDepTypes": ["golang"],
+      "groupName": "golangVersionUpdate"
+    },
+    {
       "matchDatasources": ["docker"],
       "matchPackageNames": ["golang"],
       "groupName": "golangVersionUpdate"
