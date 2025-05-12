@@ -10,6 +10,20 @@
     {
       "matchDatasources": ["golang-version"],
       "groupName": "golangVersionUpdate"
-    }
+    },
+    {
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["golang"],
+      "groupName": "golangVersionUpdate"
+    },
+    {
+      "matchManagers": ["github-actions"],
+      "matchPackageNames": [
+        "actions/go-versions",
+      ],
+      "groupName": "golangVersionUpdate"
+    },
   ]
 }
+
+
