@@ -7,6 +7,7 @@ require github.com/google/uuid v1.6.0
 require (
 	github.com/agiledragon/gomonkey/v2 v2.13.0
 	github.com/google/go-github/v62 v62.0.0
+	github.com/google/go-github/v72 v72.0.0
 	github.com/microcosm-cc/bluemonday v1.0.27
 	github.com/prometheus/client_golang v1.22.0
 	github.com/testcontainers/testcontainers-go v0.37.0
