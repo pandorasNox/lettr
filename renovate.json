@@ -29,7 +29,7 @@
         "actions/go-versions",
       ],
       "groupName": "golangVersionUpdate"
-    },
+    }
   ]
 }
 
