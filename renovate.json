@@ -30,7 +30,8 @@
       ],
       "groupName": "golangVersionUpdate"
     }
-  ]
+  ],
+  "postUpdateOptions": ["gomodUpdateImportPaths"]
 }
 
 
