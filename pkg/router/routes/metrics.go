@@ -3,7 +3,7 @@ package routes
 import (
 	"net/http"
 
-	"github.com/pandorasNox/lettr/pkg/server"
+	"github.com/pandorasNox/lettr/pkg/state"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/collectors"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -13,7 +13,7 @@ type metrics struct {
 	honeyTrapped prometheus.Gauge
 }
 
-func GetMetrics(server *server.Server) http.HandlerFunc {
+func GetMetrics(serverState *state.Server) http.HandlerFunc {
 	// promhandle := promhttp.Handler()
 
 	reg := prometheus.NewRegistry()
@@ -26,7 +26,7 @@ func GetMetrics(server *server.Server) http.HandlerFunc {
 	reg.MustRegister(collectors.NewBuildInfoCollector())
 
 	return func(w http.ResponseWriter, r *http.Request) {
-		m.honeyTrapped.Set(float64(server.Metrics().HoneyTrapped()))
+		m.honeyTrapped.Set(float64(serverState.Metrics().HoneyTrapped()))
 
 		promHandler := promhttp.HandlerFor(reg, promhttp.HandlerOpts{})
 

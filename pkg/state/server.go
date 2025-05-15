@@ -1,4 +1,4 @@
-package server
+package state
 
 type Server struct {
 	metrics Metrics

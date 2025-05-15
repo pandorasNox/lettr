@@ -7,21 +7,21 @@ import (
 	"github.com/pandorasNox/lettr/pkg/middleware"
 	"github.com/pandorasNox/lettr/pkg/puzzle"
 	"github.com/pandorasNox/lettr/pkg/router/routes"
-	"github.com/pandorasNox/lettr/pkg/server"
 	"github.com/pandorasNox/lettr/pkg/session"
+	"github.com/pandorasNox/lettr/pkg/state"
 )
 
-func New(staticFS iofs.FS, server *server.Server, sessions *session.Sessions, wordDb puzzle.WordDatabase, imprintUrl string, githubToken string, revision string, faviconPath string) http.Handler {
+func New(staticFS iofs.FS, serverState *state.Server, sessions *session.Sessions, wordDb puzzle.WordDatabase, imprintUrl string, githubToken string, revision string, faviconPath string) http.Handler {
 	mux := http.NewServeMux()
 
-	mux = addRoutes(mux, staticFS, server, sessions, wordDb, imprintUrl, githubToken, revision, faviconPath)
+	mux = addRoutes(mux, staticFS, serverState, sessions, wordDb, imprintUrl, githubToken, revision, faviconPath)
 
 	handlerWithRoutesWithMiddlewares := addMiddlewares(mux)
 
 	return handlerWithRoutesWithMiddlewares
 }
 
-func addRoutes(mux *http.ServeMux, staticFS iofs.FS, server *server.Server, sessions *session.Sessions, wordDb puzzle.WordDatabase, imprintUrl string, githubToken string, revision string, faviconPath string) *http.ServeMux {
+func addRoutes(mux *http.ServeMux, staticFS iofs.FS, serverState *state.Server, sessions *session.Sessions, wordDb puzzle.WordDatabase, imprintUrl string, githubToken string, revision string, faviconPath string) *http.ServeMux {
 	mux.HandleFunc("GET /static/", routes.Static(staticFS))
 	mux.HandleFunc("GET /", routes.Index(sessions, wordDb, imprintUrl, revision, faviconPath))
 	mux.HandleFunc("GET /letter-hint", routes.LetterHint(sessions, wordDb))
@@ -30,8 +30,8 @@ func addRoutes(mux *http.ServeMux, staticFS iofs.FS, server *server.Server, sess
 	mux.HandleFunc("POST /new", routes.PostNew(sessions, wordDb, imprintUrl, revision, faviconPath))
 	mux.HandleFunc("POST /help", routes.Help(sessions, wordDb))
 	mux.HandleFunc("GET /suggest", routes.GetSuggest(sessions, wordDb))
-	mux.HandleFunc("POST /suggest", routes.PostSuggest(githubToken, sessions, wordDb, server))
-	mux.HandleFunc("GET /metrics", routes.GetMetrics(server))
+	mux.HandleFunc("POST /suggest", routes.PostSuggest(githubToken, sessions, wordDb, serverState))
+	mux.HandleFunc("GET /metrics", routes.GetMetrics(serverState))
 
 	// add tesing routes
 	// mux.HandleFunc("GET /test", routes.GetTestPage())
