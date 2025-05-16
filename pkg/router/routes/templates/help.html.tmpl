@@ -4,7 +4,7 @@
         <h2 class="text-center">help</h2>
         <nav class="grid grid-cols-4 gap-4 items-center mb-1">
             <button
-                class="text-xs text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg px-3.5 py-1.5 dark:bg-gray-800 dark:text-white dark:border-gray-700 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
+                class="text-xs text-gray-900 bg-white border border-gray-300 focus:outline-hidden hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg px-3.5 py-1.5 dark:bg-gray-800 dark:text-white dark:border-gray-700 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
                 hx-get="/lettr"
                 hx-target="#lettr-container"
             >
@@ -14,7 +14,7 @@
         <div class="container mb-1">
 
             <!-- start accordion-tab  -->
-            <div class="border rounded border-gray-300 dark:border-gray-700">
+            <div class="border rounded-sm  border-gray-300 dark:border-gray-700">
                 <label for="collapse100" class="ease relative flex cursor-pointer items-center dark:bg-gray-900 px-4 py-3 pr-10 text-gray-500 transition duration-500">
                     <svg class="h-4 w-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
@@ -32,7 +32,7 @@
             <!-- end accordion-tab  -->
 
             <!-- start accordion-tab  -->
-            <div class="border rounded border-gray-300 dark:border-gray-700">
+            <div class="border rounded-sm border-gray-300 dark:border-gray-700">
                 <label for="collapse-reveal-letter" class="ease relative flex cursor-pointer items-center dark:bg-gray-900 px-4 py-3 pr-10 text-gray-500 transition duration-500">
                     <svg class="h-4 w-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
@@ -50,7 +50,7 @@
             <!-- end accordion-tab  -->
 
             <!-- start accordion-tab  -->
-            <div class="border rounded border-gray-300 dark:border-gray-700">
+            <div class="border rounded-sm border-gray-300 dark:border-gray-700">
                 <label for="collapse200" class="ease relative flex cursor-pointer items-center dark:bg-gray-900 px-4 py-3 pr-10 text-gray-500 transition duration-500">
                     <svg class="h-4 w-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
@@ -90,7 +90,7 @@
     </p>
     <p>
         <button
-            class="text-xs text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg px-3.5 py-1.5 dark:bg-gray-800 dark:text-white dark:border-gray-700 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
+            class="text-xs text-gray-900 bg-white border border-gray-300 focus:outline-hidden hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg px-3.5 py-1.5 dark:bg-gray-800 dark:text-white dark:border-gray-700 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
             hx-get="/letter-hint"
             hx-target="#letter-hints"
             hx-swap="beforeend"
@@ -108,7 +108,7 @@
             capitalize
 
             border
-            rounded
+            rounded-sm
             border-gray-300
             dark:border-gray-700
 
@@ -132,7 +132,7 @@
 {{ define "past-words" }}
   <div class="mb-10 grid col-1 justify-center">
     <input type="checkbox" id="show-past-words-checkbox" class="peer hidden absolute" />
-    <label for="show-past-words-checkbox" class="flex items-center space-x-1 cursor-pointer text-xs text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg px-3.5 py-1.5 dark:bg-gray-800 dark:text-white dark:border-gray-700 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700">
+    <label for="show-past-words-checkbox" class="flex items-center space-x-1 cursor-pointer text-xs text-gray-900 bg-white border border-gray-300 focus:outline-hidden hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg px-3.5 py-1.5 dark:bg-gray-800 dark:text-white dark:border-gray-700 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700">
       <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
       </svg>
