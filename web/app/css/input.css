@@ -1,4 +1,7 @@
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Use @source to explicitly register source paths _relative_ to the stylesheet: */
+@source "../../../pkg/router/routes/templates/**/*.{html,tmpl}";
