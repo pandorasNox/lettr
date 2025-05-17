@@ -39,7 +39,7 @@ export func_prepend;
 
 _tw_stdout=$( \
   cd "${SCRIPT_DIR}"/../web/; \
-  npx tailwindcss --config app/tailwind.config.js --input app/css/input.css --output static/generated/output.css 2>&1; \
+  npx @tailwindcss/cli --input app/css/input.css --output static/generated/output.css 2>&1; \
 );
 
 if ( echo "${_tw_stdout}" | grep "warn" | grep "No utility classes were detected in your source files" > /dev/null ); then
