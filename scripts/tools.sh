@@ -152,7 +152,7 @@ func_watch() {
     -e GITHUB_TOKEN="${GITHUB_TOKEN:?"No github token via GITHUB_TOKEN env variable provided"}" \
     -e IMPRINT_URL="${IMPRINT_URL:-}" \
     --entrypoint=ash \
-    "${DEVTOOLS_IMG_NAME}" -c "cd ./web/; npm install; cd ..; air --build.cmd 'cd ./web/ && npx @tailwindcss/cli --input app/css/input.css --output static/generated/output.css && npx tsc --project app/tsconfig.json && cd .. && go build -buildvcs=false -ldflags=\"-X 'main.Revision=$(git rev-parse --verify --short HEAD)' -X 'main.FaviconPath=/static/assets/favicon_dev'\" -o ./tmp/main' --build.bin './tmp/main' -build.include_ext 'go,tpl,tmpl,templ,html,js,ts,json,png,ico,webmanifest' -build.exclude_dir 'assets,tmp,vendor,web/node_modules,web/static/generated'"
+    "${DEVTOOLS_IMG_NAME}" -c "cd ./web/; npm install; cd ..; air --build.cmd 'cd ./web/ && npx @tailwindcss/cli --input app/css/input.css --output static/generated/output.css && npx tsc --project app/tsconfig.json && cd .. && go build -buildvcs=false -ldflags=\"-X 'main.Revision=$(git rev-parse --verify --short HEAD)' -X 'main.FaviconPath=/static/assets/favicon_dev'\" -o ./tmp/main' --build.bin './tmp/main' -build.include_ext 'go,tpl,tmpl,templ,html,js,ts,css,json,png,ico,webmanifest' -build.exclude_dir 'assets,tmp,vendor,web/node_modules,web/static/generated'"
 }
 
 func_exec_cli() {
