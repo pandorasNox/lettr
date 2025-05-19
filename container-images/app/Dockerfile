@@ -11,6 +11,7 @@ ENV WORKDIR=/workdir
 WORKDIR ${WORKDIR}
 
 RUN apk add --no-cache \
+    bats \
     git \
     tmux \
     || apk update && apk upgrade
@@ -47,8 +48,11 @@ COPY ./web ./web
 
 RUN set -eu; \
     cd ${WORKDIR}/web/; \
-    ./../scripts/tailwind_build.sh; \
-    npx tsc --project app/tsconfig.json; \
+    ./../scripts/tailwind_build.sh;
+RUN set -eu; \
+    cd ${WORKDIR}/web/; \
+    npx tsc --project app/tsconfig.json;
+RUN set -eu; \
     cd ${WORKDIR}; \
     go build -buildvcs=false -o /tmp/lettr -ldflags="-X 'main.Revision=${GIT_REVISION}'";
 
@@ -57,6 +61,13 @@ ENTRYPOINT ["/usr/bin/env", "ash"]
 # =============================================================
 
 FROM builder-and-dev AS tester
+
+COPY ./scripts/checks "${WORKDIR}/scripts/checks"
+
+RUN set -e; \
+    echo "◌ start running bats tests"; \
+    ./scripts/checks/tailwind_sanity_check.bats; \
+    echo "√ done running bats tests";
 
 RUN go test -v ./...
 
