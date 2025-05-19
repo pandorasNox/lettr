@@ -37,9 +37,18 @@ func_prepend() {(
 )}
 export func_prepend;
 
+echo "";
+echo "... start tailwind build"
+
+_tailwindOutFilePath=static/generated/output.css
+
+if test -f "${_tailwindOutFilePath}"; then
+  rm "${_tailwindOutFilePath}"
+fi
+
 _tw_stdout=$( \
   cd "${SCRIPT_DIR}"/../web/; \
-  npx @tailwindcss/cli --input app/css/input.css --output static/generated/output.css 2>&1; \
+  npx @tailwindcss/cli --minify --input app/css/input.css --output "${_tailwindOutFilePath}" 2>&1; \
 );
 
 if ( echo "${_tw_stdout}" | grep "warn" | grep "No utility classes were detected in your source files" > /dev/null ); then
@@ -47,5 +56,7 @@ if ( echo "${_tw_stdout}" | grep "warn" | grep "No utility classes were detected
   echo "error: found unwamnted warning in tailwind output (see above)"
   exit 1;
 fi
+
+echo "tailwind out:\n ${_tw_stdout}"
 
 echo "√ tailwind build ok"
