@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "lettr frontend",
   "engines": {
-    "node": "22.15.0"
+    "node": "22.16.0"
   },
   "main": "index.js",
   "scripts": {
