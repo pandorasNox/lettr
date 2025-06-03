@@ -1,4 +1,4 @@
-FROM mariadb:11.7.2@sha256:11706a6fd276c2eada52d0d69b1a2aa1f1484cbe78137678e02cca8f7a0ae502
+FROM mariadb:11.7.2@sha256:fcc7fcd7114adb5d41f14d116b8aac45f94280d2babfbbb71b4782922ee6d8d4
 
 RUN set -e; \
     test "1" = "$(cat /etc/os-release | grep -i 'Name="Ubuntu"' | wc -l)"; \
