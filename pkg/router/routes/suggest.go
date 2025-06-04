@@ -38,7 +38,12 @@ func PostSuggest(githubToken string, sessions *session.Sessions, wdb puzzle.Word
 		if err != nil {
 			log.Printf("error: %s", err)
 
+			// note (in regards to htmx frontend):
+			//   * we want to use correct / as-intendet http response codes for their respected cases (e.g. 2xx/3xx for successful-ish, 4xx for client errors... etc)
+			//   * issue is: htmx (frontend lib) would do nothing after reciving a non http success code (default behaviour = no swapping)
+			//   * that means: we need to handle that in our frontend js code accordingly, make htmx to take care of right behaviour (e.g. add custom htmx event handler or the 'htmx-ext-response-targets' extension, which can handle e.g. 422 codes)
 			w.WriteHeader(422)
+
 			notifier.AddError("can not parse form data")
 			err = templates.Routes.ExecuteTemplate(w, "oob-messages", notifier.ToTemplate())
 			if err != nil {
@@ -65,7 +70,12 @@ func PostSuggest(githubToken string, sessions *session.Sessions, wdb puzzle.Word
 
 		err = tds.Validate()
 		if err != nil {
+			// note (in regards to htmx frontend):
+			//   * we want to use correct / as-intendet http response codes for their respected cases (e.g. 2xx/3xx for successful-ish, 4xx for client errors... etc)
+			//   * issue is: htmx (frontend lib) would do nothing after reciving a non http success code (default behaviour = no swapping)
+			//   * that means: we need to handle that in our frontend js code accordingly, make htmx to take care of right behaviour (e.g. add custom htmx event handler or the 'htmx-ext-response-targets' extension, which can handle e.g. 422 codes)
 			w.WriteHeader(422)
+
 			w.Header().Add("HX-Reswap", "none")
 
 			notifier.AddError(err.Error())
@@ -81,7 +91,12 @@ func PostSuggest(githubToken string, sessions *session.Sessions, wdb puzzle.Word
 			context.Background(), githubToken, tds.Word, tds.Language, tds.Action, tds.Message,
 		)
 		if err != nil {
+			// note (in regards to htmx frontend):
+			//   * we want to use correct / as-intendet http response codes for their respected cases (e.g. 2xx/3xx for successful-ish, 4xx for client errors... etc)
+			//   * issue is: htmx (frontend lib) would do nothing after reciving a non http success code (default behaviour = no swapping)
+			//   * that means: we need to handle that in our frontend js code accordingly, make htmx to take care of right behaviour (e.g. add custom htmx event handler or the 'htmx-ext-response-targets' extension, which can handle e.g. 422 codes)
 			w.WriteHeader(422)
+
 			w.Header().Add("HX-Reswap", "none")
 
 			notifier.AddError("Could not send suggestion.")
