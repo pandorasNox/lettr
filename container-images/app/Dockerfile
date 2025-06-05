@@ -52,7 +52,7 @@ RUN set -eu; \
     ./../scripts/tailwind_build.sh;
 RUN set -eu; \
     cd ${WORKDIR}/web/; \
-    npx tsc --project app/tsconfig.json;
+    ./node_modules/.bin/esbuild app/main.ts --tsconfig=app/tsconfig.json --bundle --minify --outfile=static/generated/main.js;
 RUN set -eu; \
     cd ${WORKDIR}; \
     go build -buildvcs=false -o /tmp/lettr -ldflags="-X 'main.Revision=${GIT_REVISION}'";

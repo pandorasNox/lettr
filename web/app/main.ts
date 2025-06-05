@@ -1,4 +1,5 @@
-declare var htmx: any;
+import htmx from 'htmx.org';
+import 'htmx-ext-response-targets';
 
 interface CustomHtmxEvent<T = any> extends Event {
     detail?: T;
@@ -31,7 +32,6 @@ interface CustomHtmxEvent<T = any> extends Event {
 
             document.body.addEventListener('htmx:beforeSwap', function(evt: CustomHtmxEvent) {
                 if (evt.detail.xhr.status === 422) {
-                    console.log(evt);
                     // allow 422 responses to swap as we are using this as a signal that
                     // a form was submitted with bad data and want to rerender with the
                     // errors
