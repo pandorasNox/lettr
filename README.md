@@ -74,6 +74,9 @@ While any contributions you make are appreciated, please lower and manage your e
                 * also: htmx repo probbably should be forked + synced with upstream
                 * + add renovate
             * much more clean & professional to own it + allows customizations
+    * [ ] decide if we want to use htmx response extension vs htmx oob-swat core + custom js code
+      * note: we want philosopical correct http error codes
+      * atm we use both => quesion should we only use one, when, which one, when not, why both + wrote adr (decision record)
     * [ ] "someone" does not trust our tests, and with this bulletpoint solved would
         * [ ] include browser based e2e tests e.g. playwright/cypress
         * [ ] api tests?

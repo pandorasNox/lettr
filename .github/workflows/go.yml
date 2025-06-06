@@ -41,7 +41,7 @@ jobs:
           cd web;
           npm install;
           ./../scripts/tailwind_build.sh;
-          npx tsc --project app/tsconfig.json;
+          ./node_modules/.bin/esbuild app/main.ts --tsconfig=app/tsconfig.json --bundle --minify --outfile=static/generated/main.js;
         )
 
     - name: Set up Go
