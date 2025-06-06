@@ -67,7 +67,7 @@ COPY ./scripts/checks "${WORKDIR}/scripts/checks"
 
 RUN set -e; \
     echo "◌ start running bats tests"; \
-    ./scripts/checks/tailwind_sanity_check.bats; \
+    bats scripts/checks; \
     echo "√ done running bats tests";
 
 RUN go test -v ./...
