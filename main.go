@@ -24,9 +24,7 @@ var FaviconPath = "/static/assets/favicon"
 
 //go:embed configs/*.txt
 //go:embed web/static/assets/*
-//go:embed web/static/generated/*.js
-//go:embed web/static/generated/*.js.map
-//go:embed web/static/generated/*.css
+//go:embed web/static/generated/*
 var embedFs embed.FS
 
 type env struct {

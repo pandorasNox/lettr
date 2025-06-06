@@ -1,0 +1,7 @@
+
+# never copy .env files (should never happen, as we have strictly selected COPY, but you never know...)
+.env
+
+# web - ignore files of our typescript/javascript app
+web/node_modules
+web/static/generated
