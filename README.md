@@ -66,7 +66,7 @@ While any contributions you make are appreciated, please lower and manage your e
     * [x] os.SIGNAL handling (gracefull server Shutdown)
         * main func testing
             * https://stackoverflow.com/questions/31352239/how-to-test-the-main-package-functions
-    * [ ] self include unpack htmx javascript lib
+    * [x] self include unpack htmx javascript lib
         * reasons:
             * supply chain security
                 * don't trust external script sources, even so they are very very well known
@@ -74,6 +74,7 @@ While any contributions you make are appreciated, please lower and manage your e
                 * also: htmx repo probbably should be forked + synced with upstream
                 * + add renovate
             * much more clean & professional to own it + allows customizations
+    * [ ] add shellcheck to ci pipeline & local setup
     * [ ] decide if we want to use htmx response extension vs htmx oob-swat core + custom js code
       * note: we want philosopical correct http error codes
       * atm we use both => quesion should we only use one, when, which one, when not, why both + wrote adr (decision record)
