@@ -84,7 +84,8 @@ While any contributions you make are appreciated, please lower and manage your e
         * [ ] load tests?
         * [ ] more unit tests?
         * [ ] more integration tests? (e.g. go's testserver based tests)
-- nice-to-have
+    * [ ] renoevate: for docker images add compatibility / build versioing to also update alpine version
+- nice-to-have (e.g. node & golang)
     * [x] option for double letter hint
     * [x] auto updates via e.g. renovate
         * [installing-onboarding](https://github.com/renovatebot/renovate/blob/0351bd5028d74de04a8a5de217f9864f49979b19/docs/usage/getting-started/installing-onboarding.md)
