@@ -1,0 +1,4 @@
+enable=require-variable-braces
+
+# allow "useless cat" for convenience/readability/maintainability
+disable=SC2002
