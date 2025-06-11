@@ -1,8 +1,8 @@
-FROM mariadb:11.7.2@sha256:fcc7fcd7114adb5d41f14d116b8aac45f94280d2babfbbb71b4782922ee6d8d4
+FROM mariadb:11.8.2@sha256:1e669024fc94f626b9dc48bf47b29b5339cec203c28e61a3dc372991a345daf5
 
 RUN set -e; \
     test "1" = "$(cat /etc/os-release | grep -i 'Name="Ubuntu"' | wc -l)"; \
-    test "1" = "$(cat /etc/os-release | grep 'VERSION="22.04.4 LTS (Jammy Jellyfish)"' | wc -l)";
+    test "1" = "$(cat /etc/os-release | grep 'VERSION="24.04.2 LTS (Noble Numbat)"' | wc -l)";
 
 RUN set -e; \
     apt-get update; \
