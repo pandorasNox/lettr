@@ -22,7 +22,7 @@ DATASETS_DIR=${1?missing first argument datasets dir}
 echo "using dataset dir:'${DATASETS_DIR}'"
 
 func_do() {
-    dirs=$(find ${DATASETS_DIR} -maxdepth 1 -mindepth 1 -type d -printf '%f\n')
+    dirs=$(find "${DATASETS_DIR}" -maxdepth 1 -mindepth 1 -type d -printf '%f\n')
     # echo "dirs: '${dirs}'"
 
     set -- ${dirs}
@@ -34,8 +34,8 @@ func_do() {
 
         mariadb -u'root' -p'example' -e "DROP DATABASE IF EXISTS ${dir}"
         (
-            cd ${DATASETS_DIR}/${dir};
-            mariadb -uroot -p'example' < ${dir}-import.sql
+            cd "${DATASETS_DIR}/${dir}";
+            mariadb -uroot -p'example' < "${dir}"-import.sql
         )
     done
 }

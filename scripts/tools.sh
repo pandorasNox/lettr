@@ -16,6 +16,12 @@ fi
 
 # -----------------------------------------------------------------------------
 
+#SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+SCRIPT_DIR=$(dirname "$0"); SCRIPT_DIR=$(eval "cd \"${SCRIPT_DIR}\" && pwd")
+echo "SCRIPT_DIR: ${SCRIPT_DIR}"
+
+# -----------------------------------------------------------------------------
+
 # load .env file, if exists
 
 # if ! test -f ".env"; then
@@ -60,11 +66,12 @@ func_cli() {
     func_start_idle_container "${DEVTOOLS_IMG_NAME}" "${CONTAINER_NAME}"
   fi
 
-  docker exec -it ${CONTAINER_NAME} ash
+  docker exec -it "${CONTAINER_NAME}" ash
 }
 
 func_setup() {
   (
+    # shellcheck disable=SC2235
     if (! test -f ".env") && test -f ".env.template" ; then
       cp .env.template .env
     fi
@@ -76,7 +83,7 @@ func_gofmt() {(
 
   echo "🚗 start gofmt";
 
-  find . -name "*.go" | xargs gofmt -l -s -w;
+  find . -name "*.go" -print0 | xargs -0 gofmt -l -s -w;
 
   echo "🏁 done gofmt";
 )}
@@ -106,6 +113,7 @@ func_build_img() {
     _progressArgs="--progress=${PROGRESS}"
   fi
 
+  # shellcheck disable=SC2086
   docker build \
     -t "${IMG_NAME}" \
     -f container-images/app/Dockerfile \
@@ -132,11 +140,11 @@ func_start_idle_container() {
 
   if ! (docker ps --format "{{.Names}}" | grep "${CONTAINER_NAME}"); then
     docker run -d --rm \
-      --name ${CONTAINER_NAME} \
+      --name "${CONTAINER_NAME}" \
       -w "/workdir" \
       -v "${PWD}":"/workdir" \
       --entrypoint=ash \
-      ${IMG_NAME} -c "while true; do sleep 2000000; done"
+      "${IMG_NAME}" -c "while true; do sleep 2000000; done"
       # -v "${PWD}/tmp/local_go_dev_dir":"/go" \
   fi
 }
@@ -164,7 +172,7 @@ func_exec_cli() {
     func_start_idle_container "${DEVTOOLS_IMG_NAME}" "${CONTAINER_NAME}"
   fi
 
-  docker exec -t ${CONTAINER_NAME} ash -c "$@"
+  docker exec -t "${CONTAINER_NAME}" ash -c "$@"
 }
 
 func_down() {
@@ -185,7 +193,7 @@ func_typescript_build() {
     func_start_idle_container "${DEVTOOLS_IMG_NAME}" "${CONTAINER_NAME}"
   fi
 
-  docker exec -t ${CONTAINER_NAME} ash -ce "cd ./web/; npm install; ./node_modules/.bin/esbuild app/main.ts --tsconfig=app/tsconfig.json --bundle --minify --sourcemap --outfile=static/generated/main.js;"
+  docker exec -t "${CONTAINER_NAME}" ash -ce "cd ./web/; npm install; ./node_modules/.bin/esbuild app/main.ts --tsconfig=app/tsconfig.json --bundle --minify --sourcemap --outfile=static/generated/main.js;"
 }
 
 func_tailwind_build() {
@@ -197,7 +205,7 @@ func_tailwind_build() {
     func_start_idle_container "${DEVTOOLS_IMG_NAME}" "${CONTAINER_NAME}"
   fi
 
-  docker exec -t ${CONTAINER_NAME} ash -ce "cd ./web/; npm install; npx @tailwindcss/cli --input app/css/input.css --output static/generated/output.css;"
+  docker exec -t "${CONTAINER_NAME}" ash -ce "cd ./web/; npm install; npx @tailwindcss/cli --input app/css/input.css --output static/generated/output.css;"
 }
 
 func_deploy() {
@@ -214,7 +222,7 @@ func_check() {
     func_start_idle_container "${DEVTOOLS_IMG_NAME}" "${CONTAINER_NAME}"
   fi
 
-  docker exec -t ${CONTAINER_NAME} ash -ce \
+  docker exec -t "${CONTAINER_NAME}" ash -ce \
     "cd ./web/; npm install > /dev/null; ./../scripts/tailwind_build.sh" \
   ;
 }
@@ -232,9 +240,59 @@ func_lint() {(
     -v golanglint-go-root-vol:/usr/local/go \
     -v golanglint-go-mod-cache-vol:/go/pkg/mod \
     -v golanglint-lint-cache-vol:/root/.cache/golangci-lint \
-    ${CONTAINER_NAME} \
+    "${CONTAINER_NAME}" \
     -ce "golangci-lint run --config ./.golangci.yml -v" \
   ;
+)}
+
+func_shellcheck() {(
+  echo "run shellcheck";
+
+  CONTAINER_NAME=koalaman/shellcheck-alpine:v0.10.0;
+
+  docker run -i --rm --entrypoint=ash -w /mnt/workdir -v "$(pwd):/mnt/workdir" "${CONTAINER_NAME}" -s <<EOF
+      find . -name '*.sh' -exec shellcheck --rcfile /mnt/workdir/configs/.shellcheckrc {} +;
+EOF
+)}
+
+
+func_shellcheck_fix() {(
+  echo "run shellcheck";
+
+  CONTAINER_NAME=koalaman/shellcheck-alpine:v0.10.0;
+
+  _rootDir=$(realpath "${SCRIPT_DIR}/..");
+  mkdir -p "${_rootDir}/tmp";
+
+  DIFF_FILE="${_rootDir}/tmp/shellcheck.diff";
+  printf '...delete possible existing diff\n' "";
+  rm "${DIFF_FILE}" || true;
+
+  printf '...run shellcheck\n' "";
+  set +e
+  docker run -i --rm --entrypoint=ash -w /mnt/workdir -v "$(pwd):/mnt/workdir" "${CONTAINER_NAME}" -s <<EOF > "${DIFF_FILE}"
+      find . -name '*.sh' -exec shellcheck -f diff --rcfile /mnt/workdir/configs/.shellcheckrc {} +;
+EOF
+
+  EXIT_CODE=${?}
+  if [ "${EXIT_CODE}" -eq 0 ]; then
+    printf '...no fixable shellcheck errors.\n' "";
+    exit 0;
+  fi
+  set -e
+
+  if ! test -s "${DIFF_FILE}"; then
+    printf 'error: shellcheck failed with finding issues, but shellcheck can not edit/format those itself (needs manual intervention, please run e.g. `make shellcheck`) .\n' "";
+    exit 1;
+  fi
+
+  (
+    cd "${SCRIPT_DIR}/..";
+    printf '... git apply check diff\n' "";
+    cat "${DIFF_FILE}" | sed 's|--- a/\./|--- a/|g' | sed 's|+++ b/\./|+++ b/|g' | git apply --check;
+    printf '... git apply diff\n' "";
+    cat "${DIFF_FILE}" | sed 's|--- a/\./|--- a/|g' | sed 's|+++ b/\./|+++ b/|g' | git apply;
+  )
 )}
 
 # -----------------------------------------------------------------------------
@@ -242,7 +300,7 @@ func_lint() {(
 #   up                ...
 #   down              ...
 __usage="
-Usage: $(basename $0) [OPTIONS]
+Usage: $(basename "$0") [OPTIONS]
 
 Options:
   --help|-h         show help
@@ -267,45 +325,45 @@ Options:
 
 if [ -z "$*" ]
 then
-  echo "$__usage"
+  echo "${__usage}"
 else
-    if [ $1 == "--help" ] || [ $1 == "-h" ]
+    if [ "$1" == "--help" ] || [ "$1" == "-h" ]
     then
-      echo "$__usage"
+      echo "${__usage}"
       exit 0;
     fi
 
-    if [ $1 == "check" ]
+    if [ "$1" == "check" ]
     then
       func_check
       exit 0;
     fi
 
-    if [ $1 == "cli" ]
+    if [ "$1" == "cli" ]
     then
       func_cli
       exit 0;
     fi
 
-    if [ $1 == "setup" ]
+    if [ "$1" == "setup" ]
     then
       func_setup
       exit 0;
     fi
 
-    if [ $1 == "fmt" ]
+    if [ "$1" == "fmt" ]
     then
       func_gofmt
       exit 0;
     fi
 
-    if [ $1 == "watch" ]
+    if [ "$1" == "watch" ]
     then
       func_watch
       exit 0;
     fi
 
-    if [ $1 == "test" ]
+    if [ "$1" == "test" ]
     then
       # func_exec_cli "go test -v ."
       # func_exec_cli "go test -v ./..."
@@ -314,66 +372,78 @@ else
       exit 0;
     fi
 
-    if [ $1 == "bench" ]
+    if [ "$1" == "bench" ]
     then
       func_exec_cli "go test -bench=. -run=^$ -cpu=1 -benchmem -count=10"
       exit 0;
     fi
 
-    if [ $1 == "down" ]
+    if [ "$1" == "down" ]
     then
       func_down
       exit 0;
     fi
 
-    if [ $1 == "skocli" ]
+    if [ "$1" == "skocli" ]
     then
       func_skopeo_cli
       exit 0;
     fi
 
-    if [ $1 == "img" ]
+    if [ "$1" == "img" ]
     then
       func_build_img --img-name="${DEVTOOLS_IMG_NAME}" --target=builder-and-dev;
       func_build_img --img-name="${PROD_IMG_NAME}" --target=prod;
       exit 0;
     fi
 
-    if [ $1 == "lint" ]
+    if [ "$1" == "lint" ]
     then
       func_lint;
       exit 0;
     fi
 
-    if [ $1 == "tsc" ]
+    if [ "$1" == "shellcheck" ]
+    then
+      func_shellcheck;
+      exit 0;
+    fi
+
+    if [ "$1" == "shellcheck-fix" ]
+    then
+      func_shellcheck_fix;
+      exit 0;
+    fi
+
+    if [ "$1" == "tsc" ]
     then
       func_typescript_build
       exit 0;
     fi
 
-    if [ $1 == "twind" ] || [ $1 == "tailwind" ]
+    if [ "$1" == "twind" ] || [ "$1" == "tailwind" ]
     then
       func_tailwind_build
       exit 0;
     fi
 
-    if [ $1 == "prod" ]
+    if [ "$1" == "prod" ]
     then
       func_start_prod
       exit 0;
     fi
 
-    if [ $1 == "deploy" ]
+    if [ "$1" == "deploy" ]
     then
       func_deploy
       exit 0;
     fi
 
-    if [ $1 != "" ]
+    if [ "$1" != "" ]
     then
       echo "error: nor argument provided"
 
-      echo "$__usage"
+      echo "${__usage}"
     
       exit 1;
     fi
