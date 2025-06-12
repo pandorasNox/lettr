@@ -38,8 +38,9 @@ isconnected=0
 while [ "${counter}" -lt 20 ]
 do
 
-    DBSTATUS=$(mariadb -h "${MYSQL_HOST}" -P "${MYSQL_PORT}" -u"${MYSQL_USER}" -p"${MYSQL_PASSWORD}" -e "SHOW DATABASES;" 2>&1 )
-    if [ "$?" -eq "0" ]
+    _dbStatus=$(mariadb -h "${MYSQL_HOST}" -P "${MYSQL_PORT}" -u"${MYSQL_USER}" -p"${MYSQL_PASSWORD}" -e "SHOW DATABASES;" 2>&1 )
+    _exitCode=$?
+    if [ "${_exitCode}" -eq "0" ]
     then
         #echo "Connection ok"
         isconnected=1
@@ -53,7 +54,7 @@ do
 
     sleep 5
 
-    counter=$(expr "${counter}" + 1)
+    counter=$(( counter + 1 ))
 done
 
 # connection success
@@ -65,7 +66,7 @@ fi
 # connection failure
 if [ ${isconnected} -eq 0 ]
 then
-    echo "${DBSTATUS}" | tail -n 1
+    echo "${_dbStatus}" | tail -n 1
     exit 1
 fi
 

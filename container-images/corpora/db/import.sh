@@ -25,6 +25,7 @@ func_do() {
     dirs=$(find "${DATASETS_DIR}" -maxdepth 1 -mindepth 1 -type d -printf '%f\n')
     # echo "dirs: '${dirs}'"
 
+    # shellcheck disable=SC2086
     set -- ${dirs}
 
     for dir in "${@}"; do
