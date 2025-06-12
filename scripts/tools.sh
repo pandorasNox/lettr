@@ -16,6 +16,11 @@ fi
 
 # -----------------------------------------------------------------------------
 
+#SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+SCRIPT_DIR=$(dirname "$0"); SCRIPT_DIR=$(eval "cd \"$SCRIPT_DIR\" && pwd")
+echo "SCRIPT_DIR: ${SCRIPT_DIR}"
+# -----------------------------------------------------------------------------
+
 # load .env file, if exists
 
 # if ! test -f ".env"; then
@@ -26,7 +31,8 @@ fi
 if test -f ".env"; then
   echo "loading .env file"
   set -o allexport;
-  . ./.env; #source file
+  # shellcheck disable=SC1091 # 'shellcheck source=.env' won't work herre for us as .env won't be available in ci
+  . "${SCRIPT_DIR}/../.env"; #source file
   set +o allexport;
 fi
 
