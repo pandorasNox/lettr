@@ -24,7 +24,7 @@ echo "write corpora export to: ${EXPORT_DIR}"
 
 func_ensureExportDirectoryIsWritable() {
   EXP_DIR=${1?missing first argument export dir (absolut path)}
-  EXP_DIR=${EXP_DIR}/exports
+  EXP_DIR="${EXP_DIR}/exports"
   echo "ensure export dir is writable: ${EXP_DIR}"
 
   if test ! -d "${EXP_DIR}"; then
@@ -33,23 +33,25 @@ func_ensureExportDirectoryIsWritable() {
 
   # ensure host target folder doesn't exist
   (
-    cd ${EXP_DIR}
-    existingExportFiles=$(find -name "*-export.txt" -maxdepth 1 -mindepth 1 -type f -printf '%f\n')
+    cd "${EXP_DIR}"
+    existingExportFiles=$(find . -name "*-export.txt" -maxdepth 1 -mindepth 1 -type f -printf '%f\n')
     echo "delete existing files..."
 
+    # shellcheck disable=SC2086
     set -- ${existingExportFiles}
     for file in "${@}"; do
       echo "...delete old file ${file}"
-      rm ${file}
+      rm "${file}"
     done
   )
-  rmdir ${EXP_DIR}
+  rmdir "${EXP_DIR}"
 }
 
 func_do() {
-    dirs=$(find ${DATASETS_DIR} -maxdepth 1 -mindepth 1 -type d -printf '%f\n')
+    dirs=$(find "${DATASETS_DIR}" -maxdepth 1 -mindepth 1 -type d -printf '%f\n')
     # echo "dirs: '${dirs}'"
 
+    # shellcheck disable=SC2086
     set -- ${dirs}
 
     tmpDir=$(mktemp -d)
@@ -64,11 +66,11 @@ func_do() {
         echo "process database '${dir##*/}'...";    # print everything after the final "/"
 
         queryFileName=query.txt
-        tmpQueryFilePath=${tmpDir}/${queryFileName}
+        tmpQueryFilePath="${tmpDir}/${queryFileName}"
 
-        exportFilePath=/tmp/exports/corpora-${dir}-export.txt
+        exportFilePath="/tmp/exports/corpora-${dir}-export.txt"
 
-cat << EOF > ${tmpQueryFilePath}
+cat << EOF > "${tmpQueryFilePath}"
 USE ${dir};
 SELECT LOWER(word) FROM words
 WHERE CHAR_LENGTH(word) = 5
@@ -80,20 +82,21 @@ INTO OUTFILE '${exportFilePath}'
 EOF
 
         # run export
-        cat ${tmpQueryFilePath} | mariadb -uroot -p'example' ${dir}
+        # shellcheck disable=SC2002
+        cat "${tmpQueryFilePath}" | mariadb -uroot -p'example' "${dir}"
         echo "...done exporting ${dir}"
 
         # cleanup tmp files
-        rm ${tmpQueryFilePath}
+        rm "${tmpQueryFilePath}"
 
     done
 
     # remove tmp query dir
-    rmdir ${tmpDir}
+    rmdir "${tmpDir}"
 
     func_ensureExportDirectoryIsWritable "${EXPORT_DIR}"
 
-    mv /tmp/exports ${EXPORT_DIR}
+    mv /tmp/exports "${EXPORT_DIR}"
     echo "...done moving new corpora exports"
 }
 
