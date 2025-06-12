@@ -32,7 +32,8 @@ echo "SCRIPT_DIR: ${SCRIPT_DIR}"
 if test -f ".env"; then
   echo "loading .env file"
   set -o allexport;
-  . ./.env; #source file
+  # shellcheck disable=SC1091 # 'shellcheck source=.env' won't work herre for us as .env won't be available in ci
+  . "${SCRIPT_DIR}/../.env"; #source file
   set +o allexport;
 fi
 
