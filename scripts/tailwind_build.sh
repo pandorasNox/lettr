@@ -30,7 +30,8 @@ func_prepend() {(
   # check _charAmount is positve integer expression
   test "${_charAmount}" -eq "${_charAmount#-}" || (echo "error: first argument should be positve integer"; exit 1;);
 
-  _fill=$( for i in $(seq 1 "${_charAmount}"); do printf "${_char}" ''; done );
+  # shellcheck disable=SC2034
+  _fill=$( for i in $(seq 1 "${_charAmount}"); do printf '%s' "${_char}"; done );
   _res="$( printf '%s' "${_inputText}" | awk "{print \"${_fill}\" \$0}" )";
 
   printf '%s' "${_res}";
@@ -57,6 +58,6 @@ if ( echo "${_tw_stdout}" | grep "warn" | grep "No utility classes were detected
   exit 1;
 fi
 
-echo "tailwind out:\n ${_tw_stdout}"
+printf "tailwind out:\n %s\n" "${_tw_stdout}"
 
 echo "√ tailwind build ok"
