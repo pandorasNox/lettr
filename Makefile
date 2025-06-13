@@ -55,6 +55,10 @@ lint:
 shellcheck:
 	./scripts/tools.sh shellcheck
 
+.PHONY: shellcheck-fix
+shellcheck-fix:
+	./scripts/tools.sh shellcheck-fix
+
 .PHONY: tsc
 tsc:
 	./scripts/tools.sh tsc

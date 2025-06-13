@@ -17,7 +17,7 @@ fi
 # -----------------------------------------------------------------------------
 
 #SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-SCRIPT_DIR=$(dirname "$0"); SCRIPT_DIR=$(eval "cd \"$SCRIPT_DIR\" && pwd")
+SCRIPT_DIR=$(dirname "$0"); SCRIPT_DIR=$(eval "cd \"${SCRIPT_DIR}\" && pwd")
 echo "SCRIPT_DIR: ${SCRIPT_DIR}"
 # -----------------------------------------------------------------------------
 
@@ -255,6 +255,37 @@ func_shellcheck() {(
 EOF
 )}
 
+
+func_shellcheck_fix() {(
+  echo "run shellcheck";
+
+  CONTAINER_NAME=koalaman/shellcheck-alpine:v0.10.0;
+
+  DIFF_FILE="$(realpath "${SCRIPT_DIR}/../tmp/shellcheck.diff")"
+  printf '...delete possible existing diff\n' "";
+  rm "${DIFF_FILE}" || true;
+
+  printf '...run shellcheck\n' "";
+  set +e
+  docker run -i --rm --entrypoint=ash -w /mnt/workdir -v "$(pwd):/mnt/workdir" "${CONTAINER_NAME}" -s <<EOF > "${DIFF_FILE}"
+      find . -name '*.sh' -exec shellcheck -f diff -o require-variable-braces {} +;
+EOF
+
+  EXIT_CODE=${?}
+  if [ "${EXIT_CODE}" -eq 0 ]; then
+    printf '...no fixable shellcheck errors.\n' "";
+    exit 0;
+  fi
+  set -e
+
+  printf '...apply diff\n' "";
+  (
+    cd "${SCRIPT_DIR}/..";
+    mv "${DIFF_FILE}" .
+    cat "./shellcheck.diff" | git apply;
+  )
+)}
+
 # -----------------------------------------------------------------------------
 
 #   up                ...
@@ -285,11 +316,11 @@ Options:
 
 if [ -z "$*" ]
 then
-  echo "$__usage"
+  echo "${__usage}"
 else
     if [ "$1" == "--help" ] || [ "$1" == "-h" ]
     then
-      echo "$__usage"
+      echo "${__usage}"
       exit 0;
     fi
 
@@ -363,10 +394,15 @@ else
       exit 0;
     fi
 
-
     if [ "$1" == "shellcheck" ]
     then
       func_shellcheck;
+      exit 0;
+    fi
+
+    if [ "$1" == "shellcheck-fix" ]
+    then
+      func_shellcheck_fix;
       exit 0;
     fi
 
@@ -398,7 +434,7 @@ else
     then
       echo "error: nor argument provided"
 
-      echo "$__usage"
+      echo "${__usage}"
     
       exit 1;
     fi
