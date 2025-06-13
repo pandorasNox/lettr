@@ -251,7 +251,7 @@ func_shellcheck() {(
   CONTAINER_NAME=koalaman/shellcheck-alpine:v0.10.0;
 
   docker run -i --rm --entrypoint=ash -w /mnt/workdir -v "$(pwd):/mnt/workdir" "${CONTAINER_NAME}" -s <<EOF
-      find . -name '*.sh' -exec shellcheck {} +;
+      find . -name '*.sh' -exec shellcheck -o require-variable-braces {} +;
 EOF
 )}
 
