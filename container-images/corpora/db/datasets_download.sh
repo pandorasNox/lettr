@@ -17,7 +17,7 @@ fi
 # -----------------------------------------------------------------------------
 
 DOWNLOAD_DIR=${1?missing first argument download dir}
-echo ${DOWNLOAD_DIR}
+echo "${DOWNLOAD_DIR}"
 
 func_download () {
   set -- \
@@ -31,10 +31,10 @@ func_download () {
     printf 'download %s...' "${item}";
     curl -s \
       --output "${DOWNLOAD_DIR}/${item}.tar.gz" \
-      https://downloads.wortschatz-leipzig.de/corpora/${item}.tar.gz \
+      https://downloads.wortschatz-leipzig.de/corpora/"${item}".tar.gz \
     ;
-    tar -xvzf ${DOWNLOAD_DIR}/${item}.tar.gz -C ${DOWNLOAD_DIR}/ > /dev/null;
-    rm ${DOWNLOAD_DIR}/${item}.tar.gz;
+    tar -xvzf "${DOWNLOAD_DIR}"/"${item}".tar.gz -C "${DOWNLOAD_DIR}"/ > /dev/null;
+    rm "${DOWNLOAD_DIR}"/"${item}".tar.gz;
     printf ' done\n';
   done
 }
