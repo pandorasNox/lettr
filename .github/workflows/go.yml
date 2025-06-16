@@ -52,6 +52,9 @@ jobs:
     - name: Build
       run: go build -v ./...
 
+    - name: Run shellcheck (via container)
+      run: ./scripts/checks/shellcheck.sh
+
     # - name: Test
     #   run: go test -v ./...
     - name: run test (via container build test target)
