@@ -246,53 +246,11 @@ func_lint() {(
 )}
 
 func_shellcheck() {(
-  echo "run shellcheck";
-
-  CONTAINER_NAME=koalaman/shellcheck-alpine:v0.10.0;
-
-  docker run -i --rm --entrypoint=ash -w /mnt/workdir -v "$(pwd):/mnt/workdir" "${CONTAINER_NAME}" -s <<EOF
-      find . -name '*.sh' -exec shellcheck --rcfile /mnt/workdir/configs/.shellcheckrc {} +;
-EOF
+  "${SCRIPT_DIR}/checks/shellcheck.sh"
 )}
 
-
 func_shellcheck_fix() {(
-  echo "run shellcheck";
-
-  CONTAINER_NAME=koalaman/shellcheck-alpine:v0.10.0;
-
-  _rootDir=$(realpath "${SCRIPT_DIR}/..");
-  mkdir -p "${_rootDir}/tmp";
-
-  DIFF_FILE="${_rootDir}/tmp/shellcheck.diff";
-  printf '...delete possible existing diff\n' "";
-  rm "${DIFF_FILE}" || true;
-
-  printf '...run shellcheck\n' "";
-  set +e
-  docker run -i --rm --entrypoint=ash -w /mnt/workdir -v "$(pwd):/mnt/workdir" "${CONTAINER_NAME}" -s <<EOF > "${DIFF_FILE}"
-      find . -name '*.sh' -exec shellcheck -f diff --rcfile /mnt/workdir/configs/.shellcheckrc {} +;
-EOF
-
-  EXIT_CODE=${?}
-  if [ "${EXIT_CODE}" -eq 0 ]; then
-    printf '...no fixable shellcheck errors.\n' "";
-    exit 0;
-  fi
-  set -e
-
-  if ! test -s "${DIFF_FILE}"; then
-    printf 'error: shellcheck failed with finding issues, but shellcheck can not edit/format those itself (needs manual intervention, please run e.g. `make shellcheck`) .\n' "";
-    exit 1;
-  fi
-
-  (
-    cd "${SCRIPT_DIR}/..";
-    printf '... git apply check diff\n' "";
-    cat "${DIFF_FILE}" | sed 's|--- a/\./|--- a/|g' | sed 's|+++ b/\./|+++ b/|g' | git apply --check;
-    printf '... git apply diff\n' "";
-    cat "${DIFF_FILE}" | sed 's|--- a/\./|--- a/|g' | sed 's|+++ b/\./|+++ b/|g' | git apply;
-  )
+  "${SCRIPT_DIR}/checks/shellcheck.sh" --fix
 )}
 
 # -----------------------------------------------------------------------------

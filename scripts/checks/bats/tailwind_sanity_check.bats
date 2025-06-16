@@ -1,12 +1,13 @@
 #!/usr/bin/env bats
 
 SCRIPT_DIR=${BATS_TEST_DIRNAME}
+PROJECT_ROOT_DIR=$(realpath "${SCRIPT_DIR}/../../..")
 
 func_check_output_file_size(){(
   set -e
   set -u
 
-  _outputFilePath="${SCRIPT_DIR}/../../web/static/generated/output.css"
+  _outputFilePath="${PROJECT_ROOT_DIR}/web/static/generated/output.css"
 
   _outputFileBytes=$(du -b "${_outputFilePath}" | awk '{print $1}')
   _minExpectedBytes=7186
@@ -33,7 +34,7 @@ func_check_template_contains_test_styles() {(
   set -e
   set -u
 
-  _templateFilePath="${SCRIPT_DIR}/../../pkg/router/routes/templates/pages/test.html.tmpl"
+  _templateFilePath="${PROJECT_ROOT_DIR}/pkg/router/routes/templates/pages/test.html.tmpl"
   _needles="flex shadow-lg border bg-gray-300 invert"
 
   # Check if the file exists and is readable
@@ -73,7 +74,7 @@ func_check_output_contains_test_styles() {(
   set -e
   set -u
 
-  _outputFilePath="${SCRIPT_DIR}/../../web/static/generated/output.css"
+  _outputFilePath="${PROJECT_ROOT_DIR}/web/static/generated/output.css"
   _needles="flex shadow-lg border bg-gray-300 invert"
 
   # Check if the file exists and is readable

@@ -67,7 +67,7 @@ COPY ./scripts/checks "${WORKDIR}/scripts/checks"
 
 RUN set -e; \
     echo "◌ start running bats tests"; \
-    bats scripts/checks; \
+    bats scripts/checks/bats; \
     echo "√ done running bats tests";
 
 RUN go test -v ./...
