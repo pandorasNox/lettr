@@ -11,13 +11,13 @@ PROJECT_ROOT_DIR=$(realpath "${SCRIPT_DIR}/../..")
 
 # -----------------------------------------------------------------------------
 
-_fix=0
+_fix=false
 
 # handle flags, see https://stackoverflow.com/a/22395652
 while test $# -gt 0 ; do
 
   # options with arguments
-  if test "$1" = "--fix" ; then _fix=1 ; shift ; continue; fi
+  if test "$1" = "--fix" ; then _fix=true ; shift ; continue; fi
 
   # unknown - up to you - positional argument or error?
   echo "Unknown option $1" && exit 1
@@ -49,6 +49,21 @@ EOF
 
 # -----------------------------------------------------------------------------
 
+func_fix_shellcheck_diff_paths() {(
+  set -o errexit;
+  set -o nounset;
+
+  _diffFilePath=$1
+  if ! test -f "${_diffFilePath}"; then
+    echo "error: file with path='${_diffFilePath}' does not exist" >&2
+    return 1
+  fi
+
+  # note: for shellechecks diff file, we need to replace the path './' with '/' in the git diff/patch here,
+  #       bec otherwise `git apply` yields "error: invalid path './some/path' "
+  cat "${_diffFilePath}" | sed 's|--- a/\./|--- a/|g' | sed 's|+++ b/\./|+++ b/|g'
+)}
+
 func_shellcheck_fix() {(
   set -o errexit;
   set -o nounset;
@@ -77,10 +92,10 @@ EOF
 
   (
     cd "${PROJECT_ROOT_DIR}";
-    echo '... git apply check diff';
-    cat "${_tmpDiffFile}" | sed 's|--- a/\./|--- a/|g' | sed 's|+++ b/\./|+++ b/|g' | git apply --check;
-    echo '... git apply diff';
-    cat "${_tmpDiffFile}" | sed 's|--- a/\./|--- a/|g' | sed 's|+++ b/\./|+++ b/|g' | git apply;
+    echo '... run "git apply --check" with shellcheck diff';
+    func_fix_shellcheck_diff_paths "${_tmpDiffFile}" | git apply --check;
+    echo '... run "git apply" with shellcheck diff';
+    func_fix_shellcheck_diff_paths "${_tmpDiffFile}" | git apply;
   )
 
   echo "   running shellcheck again, in case there were issues shellcheck format could not fix"
@@ -89,16 +104,23 @@ EOF
 
 # -----------------------------------------------------------------------------
 
-echo '🔍 start shellcheck';
+func_main() {(
+  set -o errexit;
+  set -o nounset;
 
-if test "${_fix}" -eq "1"; then
-  func_shellcheck_fix;
-  echo '🟢 done shellcheck fix';
-  exit 0;
-fi
+  echo '🔍 start shellcheck';
 
-func_shellcheck
+  if test "${_fix}" = "true"; then
+    func_shellcheck_fix;
+    echo '🟢 done shellcheck fix';
+    exit 0;
+  fi
 
-echo '🟢 done shellcheck';
+  func_shellcheck
+
+  echo '🟢 done shellcheck';
+)}
 
 # -----------------------------------------------------------------------------
+
+func_main
