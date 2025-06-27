@@ -82,3 +82,7 @@ deploy:
 .PHONY: corpora
 corpora:
 	./scripts/corpora_export.sh
+
+.PHONY: renovate
+renovate:
+	./scripts/tools.sh renovate

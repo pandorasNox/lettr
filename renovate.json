@@ -31,7 +31,19 @@
       "groupName": "golangVersionUpdate"
     }
   ],
-  "postUpdateOptions": ["gomodUpdateImportPaths"]
+  "postUpdateOptions": ["gomodUpdateImportPaths"],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Update _IMAGE variables in shell scripts",
+      "fileMatch": [
+        "scripts/checks/shellcheck.sh"
+      ],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>[a-z-]+?)(?: versioning=(?<versioning>[a-z-]+?))?\\s.+?_IMAGE=(?<depName>.+?):(?<currentValue>.+?)(@(?<currentDigest>.+?))?(;)?\\s"
+      ]
+    }
+  ]
 }
 
 
