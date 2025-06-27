@@ -254,6 +254,27 @@ func_shellcheck_fix() {(
   "${SCRIPT_DIR}/checks/shellcheck.sh" --fix
 )}
 
+func_renovate() {(
+  # note:
+  #   * in regards to --platform=local
+  #     * see https://docs.renovatebot.com/modules/platform/local/
+  #   * in regards to --dry-run
+  #     * see: https://docs.renovatebot.com/self-hosted-configuration/#dryrun
+  #     * as time of writing: `--platform=local` makes `--dry-run=lookup`` default
+  #     * for better debugging to e.g. see what branches renovate would create see `--dry-run=full`
+  #       * as time of writing: "'full': Performs a dry run by logging messages instead of creating/updating/deleting branches and PRs"
+  docker run --env LOG_LEVEL=debug --rm --user "$(id -u):$(id -g)" --volume "${PWD:?}:${PWD:?}:ro" \
+    --workdir "${PWD:?}" docker.io/renovate/renovate:latest \
+    --platform=local \
+    --dry-run=lookup \
+    --enabled-managers=custom.regex
+
+  # example:
+  #   --platform=local \
+  #   --dry-run=full \
+
+)}
+
 # -----------------------------------------------------------------------------
 
 #   up                ...
@@ -272,6 +293,9 @@ Options:
   img               build all container images
   lint              run golangci-lint via docker container
   prod              build prod container image + start container running on extra port (should be printed after start)
+  renovate          run renovate in local mode via container
+  shellcheck        run shellcheck via container
+  shellcheck-fix    run shellcheck with format via container + apply found changes/diff
   setup             setup .env file
   skocli            via container provide skopeo tooling + exec into
   tailwind|twind    via container with npm/npx executing tailwind cli-tool to build css assets
@@ -395,6 +419,12 @@ else
     if [ "$1" == "deploy" ]
     then
       func_deploy
+      exit 0;
+    fi
+
+    if [ "$1" == "renovate" ]
+    then
+      func_renovate
       exit 0;
     fi
 
