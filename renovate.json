@@ -8,36 +8,52 @@
   "configMigration": true,
   "packageRules": [
     {
-      "matchDatasources": ["golang-version"],
+      "matchDatasources": [
+        "golang-version"
+      ],
       "groupName": "golangVersionUpdate"
     },
     {
-      "matchManagers": ["gomod"],
-      "matchDepNames": ["go"],
-      "matchDepTypes": ["golang"],
+      "matchManagers": [
+        "gomod"
+      ],
+      "matchDepNames": [
+        "go"
+      ],
+      "matchDepTypes": [
+        "golang"
+      ],
       "rangeStrategy": "bump",
       "groupName": "golangVersionUpdate"
     },
     {
-      "matchDatasources": ["docker"],
-      "matchPackageNames": ["golang"],
+      "matchDatasources": [
+        "docker"
+      ],
+      "matchPackageNames": [
+        "golang"
+      ],
       "groupName": "golangVersionUpdate"
     },
     {
-      "matchManagers": ["github-actions"],
+      "matchManagers": [
+        "github-actions"
+      ],
       "matchPackageNames": [
         "actions/go-versions"
       ],
       "groupName": "golangVersionUpdate"
     }
   ],
-  "postUpdateOptions": ["gomodUpdateImportPaths"],
+  "postUpdateOptions": [
+    "gomodUpdateImportPaths"
+  ],
   "customManagers": [
     {
       "customType": "regex",
       "description": "Update _IMAGE variables in shell scripts",
-      "fileMatch": [
-        "scripts/checks/shellcheck.sh"
+      "managerFilePatterns": [
+        "/scripts/checks/shellcheck.sh/"
       ],
       "matchStrings": [
         "# renovate: datasource=(?<datasource>[a-z-]+?)(?: versioning=(?<versioning>[a-z-]+?))?\\s.+?_IMAGE=(?<depName>.+?):(?<currentValue>.+?)(@(?<currentDigest>.+?))?(;)?\\s"
@@ -45,5 +61,3 @@
     }
   ]
 }
-
-
