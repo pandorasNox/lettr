@@ -255,6 +255,10 @@ func_shellcheck_fix() {(
 )}
 
 func_renovate() {(
+
+  # renovate: datasource=docker
+  CONTAINER_IMAGE=docker.io/renovate/renovate:41.17.1;
+
   # note:
   #   * in regards to --platform=local
   #     * see https://docs.renovatebot.com/modules/platform/local/
@@ -264,7 +268,7 @@ func_renovate() {(
   #     * for better debugging to e.g. see what branches renovate would create see `--dry-run=full`
   #       * as time of writing: "'full': Performs a dry run by logging messages instead of creating/updating/deleting branches and PRs"
   docker run --env LOG_LEVEL=debug --rm --user "$(id -u):$(id -g)" --volume "${PWD:?}:${PWD:?}:ro" \
-    --workdir "${PWD:?}" docker.io/renovate/renovate:latest \
+    --workdir "${PWD:?}" "${CONTAINER_IMAGE}" \
     --platform=local \
     --dry-run=lookup \
     --enabled-managers=custom.regex
