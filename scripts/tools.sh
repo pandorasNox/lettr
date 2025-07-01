@@ -182,7 +182,9 @@ func_down() {
 }
 
 func_skopeo_cli() {
-  docker run -it --rm --entrypoint=bash quay.io/skopeo/stable:v1.14.2
+  # renovate: datasource=docker
+  SKOPEO_CONTAINER_IMAGE=quay.io/skopeo/stable:v1.14.2@sha256:ac50327d3c3e814a4cae9933a62e69a62057ee7041d80786b3a4b8e733a2c1a1;
+  docker run -it --rm --entrypoint=bash "${SKOPEO_CONTAINER_IMAGE}"
 }
 
 func_typescript_build() {
@@ -231,7 +233,8 @@ func_check() {
 func_lint() {(
   echo "run golangci-lint";
 
-  CONTAINER_NAME=golangci/golangci-lint:v2.1.6-alpine;
+  # renovate: datasource=docker
+  GOLANGCI_LINT_CONTAINER_IMAGE=golangci/golangci-lint:v2.1.6-alpine@sha256:b122e5b85ddc99f62cb750039b5137247dda2327cbb96cac617bc0987be4f575;
 
   docker run -t --rm \
     --entrypoint=ash \
@@ -241,7 +244,7 @@ func_lint() {(
     -v golanglint-go-root-vol:/usr/local/go \
     -v golanglint-go-mod-cache-vol:/go/pkg/mod \
     -v golanglint-lint-cache-vol:/root/.cache/golangci-lint \
-    "${CONTAINER_NAME}" \
+    "${GOLANGCI_LINT_CONTAINER_IMAGE}" \
     -ce "golangci-lint run --config ./.golangci.yml -v" \
   ;
 )}
