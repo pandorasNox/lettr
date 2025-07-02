@@ -59,6 +59,18 @@
       "matchStrings": [
         "# renovate: datasource=(?<datasource>[a-z-]+?)(?: versioning=(?<versioning>[a-z-]+?))?\\s.+?_IMAGE=(?<depName>.+?):(?<currentValue>.+?)(@(?<currentDigest>.+?))?(;)?\\s"
       ]
+    },
+    {
+      "customType": "jsonata",
+      "fileFormat": "yaml",
+      "managerFilePatterns": [
+        "/.github/workflows/go.yml/"
+      ],
+      "matchStrings": [
+        "jobs.build.steps[name='golangci-lint'].with.{ 'currentValue': version }"
+      ],
+      "datasourceTemplate": "github-releases",
+      "packageNameTemplate": "golangci/golangci-lint"
     }
   ]
 }
