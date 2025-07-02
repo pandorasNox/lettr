@@ -234,7 +234,7 @@ func_lint() {(
   echo "run golangci-lint";
 
   # renovate: datasource=docker
-  GOLANGCI_LINT_CONTAINER_IMAGE=golangci/golangci-lint:v2.1.6-alpine@sha256:b122e5b85ddc99f62cb750039b5137247dda2327cbb96cac617bc0987be4f575;
+  GOLANGCI_LINT_CONTAINER_IMAGE=golangci/golangci-lint:v2.2.1-alpine@sha256:d2e03a7601e2ce6fdb611a5d075dc8d18ed76c47460c28567c24f44dc8a260a8;
 
   docker run -t --rm \
     --entrypoint=ash \
