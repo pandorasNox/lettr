@@ -74,7 +74,7 @@ While any contributions you make are appreciated, please lower and manage your e
                 * also: htmx repo probbably should be forked + synced with upstream
                 * + add renovate
             * much more clean & professional to own it + allows customizations
-    * [ ] add shellcheck to ci pipeline & local setup
+    * [x] add shellcheck to ci pipeline & local setup
     * [ ] ESLint
     * [ ] decide if we want to use htmx response extension vs htmx oob-swat core + custom js code
       * note: we want philosopical correct http error codes
