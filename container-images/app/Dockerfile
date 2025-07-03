@@ -35,7 +35,9 @@ COPY --from=node /usr/local/include /usr/local/include
 COPY --from=node /usr/local/bin /usr/local/bin
 
 COPY ./web/package*.json ${WORKDIR}/web/
-RUN set -eu; cd ${WORKDIR}/web/; npm install; cd ${WORKDIR}
+RUN set -eu; \
+    cd ${WORKDIR}/web/; \
+    npm install;
 
 COPY ./go.mod ./go.mod
 COPY ./go.sum ./go.sum
@@ -69,6 +71,10 @@ RUN set -e; \
     echo "◌ start running bats tests"; \
     bats scripts/checks/bats; \
     echo "√ done running bats tests";
+
+RUN set -eu; \
+        cd ${WORKDIR}/web/; \
+        npx eslint --config="./eslint.config.mjs" app/ ;
 
 RUN go test -v ./...
 
