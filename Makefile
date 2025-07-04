@@ -51,6 +51,10 @@ build:
 lint:
 	./scripts/tools.sh lint
 
+.PHONY: lint-fix
+lint-fix:
+	./scripts/tools.sh lint-fix
+
 .PHONY: shellcheck
 shellcheck:
 	./scripts/tools.sh shellcheck
