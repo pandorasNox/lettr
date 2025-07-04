@@ -230,7 +230,7 @@ func_check() {
   ;
 }
 
-func_lint() {(
+func_golangci_lint() {(
   echo "run golangci-lint";
 
   # renovate: datasource=docker
@@ -389,7 +389,14 @@ else
 
     if [ "$1" == "lint" ]
     then
-      func_lint;
+      func_golangci_lint;
+      func_exec_cli "cd web; npx eslint --config='./eslint.config.mjs' app/;"
+      exit 0;
+    fi
+
+    if [ "$1" == "lint-fix" ]
+    then
+      func_exec_cli "cd web; npx eslint --config='./eslint.config.mjs' --fix app/;"
       exit 0;
     fi
 

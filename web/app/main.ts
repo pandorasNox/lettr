@@ -1,9 +1,29 @@
-import htmx from 'htmx.org';
+import htmx, { HtmxBeforeSwapDetails, HtmxRequestConfig } from 'htmx.org';
 import 'htmx-ext-response-targets';
 
-interface CustomHtmxEvent<T = any> extends Event {
-    detail?: T;
+// ============================================================================
+
+// Define the custom event detail interface for 'htmx:afterSettle'
+interface HtmxAfterSettleDetail {
+    elt: HTMLElement;
+    xhr: XMLHttpRequest;
+    target: HTMLElement;
+    requestConfig: HtmxRequestConfig;
 }
+
+// Define the custom event type for 'htmx:afterSettle'
+interface HtmxAfterSettleEvent extends Event {
+    detail?: HtmxAfterSettleDetail;
+}
+
+// ============================================================================
+
+// type HtmxBeforeSwapEvent = CustomEvent<HtmxBeforeSwapDetail>;
+interface HtmxBeforeSwapEvent extends Event {
+    detail?: HtmxBeforeSwapDetails;
+}
+
+// ============================================================================
 
 // IIFE (Immediately Invoked Function Expression) / Self-Executing Anonymous Function
 (function () {
@@ -18,20 +38,19 @@ interface CustomHtmxEvent<T = any> extends Event {
             const inputs: NodeListOf<HTMLInputElement> =
                 document.querySelectorAll(".focusable");
 
-            let state: State = {
+            const state: State = {
                 letters: [],
                 inputs: inputs,
             };
 
             themeButtonToggleHandler();
             initKeyListener(state);
-            document.addEventListener('htmx:afterSettle', (event: CustomHtmxEvent) => {reset(state, event)}, false);
-            document.addEventListener('htmx:afterSettle', (event: CustomHtmxEvent) => {onMessages(event)}, false);
+            document.addEventListener('htmx:afterSettle', (event: HtmxAfterSettleEvent) => {reset(state, event)}, false);
+            document.addEventListener('htmx:afterSettle', (event: HtmxAfterSettleEvent) => {onMessages(event)}, false);
 
 
-
-            document.body.addEventListener('htmx:beforeSwap', function(evt: CustomHtmxEvent) {
-                if (evt.detail.xhr.status === 422) {
+            document.body.addEventListener('htmx:beforeSwap', function(evt: HtmxBeforeSwapEvent) {
+                if (evt.detail?.xhr.status === 422) {
                     // allow 422 responses to swap as we are using this as a signal that
                     // a form was submitted with bad data and want to rerender with the
                     // errors
@@ -49,7 +68,7 @@ interface CustomHtmxEvent<T = any> extends Event {
         // });
     }
 
-    function reset(state: State, event: CustomHtmxEvent): void {
+    function reset(state: State, event: HtmxAfterSettleEvent): void {
         if ((event?.detail?.xhr?.status ?? 200) === 422) {
             return;
         }
@@ -58,7 +77,7 @@ interface CustomHtmxEvent<T = any> extends Event {
         state.inputs = document.querySelectorAll(".focusable");
     }
 
-    function onMessages(event: CustomHtmxEvent): void {
+    function onMessages(_event: HtmxAfterSettleEvent): void {
         const msgsContainer = document.getElementById('messages');
         if (msgsContainer === null) {
             return
