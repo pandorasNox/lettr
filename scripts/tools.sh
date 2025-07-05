@@ -236,6 +236,19 @@ func_golangci_lint() {(
   # renovate: datasource=docker
   GOLANGCI_LINT_CONTAINER_IMAGE=golangci/golangci-lint:v2.2.1-alpine@sha256:d2e03a7601e2ce6fdb611a5d075dc8d18ed76c47460c28567c24f44dc8a260a8;
 
+  _fix=false
+  # handle flags, see https://stackoverflow.com/a/22395652
+  while test $# -gt 0 ; do
+    if test "$1" = "--fix" ; then _fix=true ; shift ; continue; fi
+    echo "Unknown option $1" && exit 1
+    shift
+  done
+
+  _golangciLintExtraArgs=""
+  if test "${_fix}" = "true"; then
+    _golangciLintExtraArgs="${_golangciLintExtraArgs} --fix"
+  fi
+
   docker run -t --rm \
     --entrypoint=ash \
     -w /workdir \
@@ -245,7 +258,7 @@ func_golangci_lint() {(
     -v golanglint-go-mod-cache-vol:/go/pkg/mod \
     -v golanglint-lint-cache-vol:/root/.cache/golangci-lint \
     "${GOLANGCI_LINT_CONTAINER_IMAGE}" \
-    -ce "golangci-lint run --config ./.golangci.yml -v" \
+    -ce "golangci-lint run ${_golangciLintExtraArgs} --config ./.golangci.yml -v" \
   ;
 )}
 
@@ -396,6 +409,7 @@ else
 
     if [ "$1" == "lint-fix" ]
     then
+      func_golangci_lint --fix
       func_exec_cli "cd web; npx eslint --config='./eslint.config.mjs' --fix app/;"
       exit 0;
     fi
