@@ -75,7 +75,7 @@ While any contributions you make are appreciated, please lower and manage your e
                 * + add renovate
             * much more clean & professional to own it + allows customizations
     * [x] add shellcheck to ci pipeline & local setup
-    * [ ] ESLint
+    * [x] ESLint
     * [ ] decide if we want to use htmx response extension vs htmx oob-swat core + custom js code
       * note: we want philosopical correct http error codes
       * atm we use both => quesion should we only use one, when, which one, when not, why both + wrote adr (decision record)
