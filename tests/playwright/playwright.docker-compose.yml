@@ -1,0 +1,39 @@
+services:
+  playwright:
+    image: mcr.microsoft.com/playwright:v1.54.1-noble
+    volumes:
+      - ./../../tests/playwright:/tests
+      - playwright-node-modules:/tests/node_modules
+    # depends_on:
+    #   - lettr-app
+    networks:
+      - shared-network
+    environment:
+      - CI=true
+    entrypoint: ["sh"]
+    command:
+      - "-c"
+      - "cd /tests && npm ci && npx playwright test"
+    #entrypoint: ["npm", "init", "&&", "npx", "playwright", "test"]
+    # entrypoint: sh
+    # command:
+    #   - "-c"
+    #   - "sleep $((60 * 60 * 24))"
+
+
+  lettr-app:
+    build: 
+      context: .
+      dockerfile: container-images/app/Dockerfile
+
+    ports:
+      - "8080:8080"
+    networks:
+      - shared-network
+
+volumes:
+  playwright-node-modules:
+
+networks:
+  shared-network:
+    driver: bridge
