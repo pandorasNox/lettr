@@ -142,6 +142,7 @@ func_start_idle_container() {
   if ! (docker ps --format "{{.Names}}" | grep "${CONTAINER_NAME}"); then
     docker run -d --rm \
       --name "${CONTAINER_NAME}" \
+      --user "$(id -u):$(id -g)" \
       -w "/workdir" \
       -v "${PWD}":"/workdir" \
       --entrypoint=ash \
