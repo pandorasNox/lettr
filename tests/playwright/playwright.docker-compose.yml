@@ -23,13 +23,18 @@ services:
 
   lettr-app:
     build: 
-      context: .
+      context: ../../
       dockerfile: container-images/app/Dockerfile
-
     ports:
-      - "8080:8080"
+      - "8080:80"
     networks:
-      - shared-network
+      shared-network:
+        aliases:
+          - lettrapp.aliases.containernetwork
+    environment:
+      - PORT=80
+      - GITHUB_TOKEN=my-secret-token-for-local-dev
+      - IMPRINT_URL=http://www.example.com/imprint
 
 volumes:
   playwright-node-modules:
