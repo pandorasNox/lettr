@@ -81,3 +81,6 @@ jobs:
         provenance: false # provenance = Generate provenance attestation for the build (shorthand for --attest=type=provenance)
         platforms: linux/amd64
         push: false
+
+    - name: run browser e2e tests with playwright (via docker compose)
+      run: ./tests/playwright/playwright.sh
