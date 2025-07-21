@@ -295,6 +295,13 @@ func_renovate() {(
 
 )}
 
+func_playwright_ui() {(
+  docker compose \
+    --file tests/playwright/playwright.docker-compose.yml \
+    --file tests/playwright/playwright-ui-patch.docker-compose.yml \
+    up
+)}
+
 # -----------------------------------------------------------------------------
 
 #   up                ...
@@ -453,6 +460,12 @@ else
     if [ "$1" == "renovate" ]
     then
       func_renovate
+      exit 0;
+    fi
+
+    if [ "$1" == "playwright-ui" ]
+    then
+      func_playwright_ui
       exit 0;
     fi
 

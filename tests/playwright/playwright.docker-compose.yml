@@ -5,7 +5,6 @@ services:
       - ./../../tests/playwright:/tests
       - playwright-node-modules:/tests/node_modules
     # depends_on:
-    #   - lettr-app
     networks:
       - shared-network
     environment:
@@ -14,6 +13,8 @@ services:
     command:
       - "-c"
       - "cd /tests && npm ci && npx playwright test"
+
+      #
     #entrypoint: ["npm", "init", "&&", "npx", "playwright", "test"]
     # entrypoint: sh
     # command:
