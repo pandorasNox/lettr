@@ -9,12 +9,12 @@ services:
       - shared-network
     environment:
       - CI=true
+      - LETTR_APP_BASE_URL=http://lettrapp.aliases.containernetwork
     entrypoint: ["sh"]
     command:
       - "-c"
       - "cd /tests && npm ci && npx playwright test"
-
-      #
+      # - "sleep $((60 * 60 * 24))"
     #entrypoint: ["npm", "init", "&&", "npx", "playwright", "test"]
     # entrypoint: sh
     # command:
