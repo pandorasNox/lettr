@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/google/go-github/v73/github"
+	"github.com/google/go-github/v74/github"
 )
 
 func CreateWordSuggestionIssue(ctx context.Context, githubToken string, word, language, action, message string) error {
