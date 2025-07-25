@@ -1,0 +1,7 @@
+services:
+  playwright:
+    ports:
+      - "8081:8081"
+    command:
+      - "-c"
+      - "cd /tests && npm ci && npx playwright test --ui-port=8081 --ui-host=0.0.0.0"

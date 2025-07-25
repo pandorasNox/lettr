@@ -1,0 +1,47 @@
+services:
+  playwright:
+    image: mcr.microsoft.com/playwright:v1.54.1-noble
+    volumes:
+      - ./../../tests/playwright:/tests
+      - playwright-node-modules:/tests/node_modules
+    # depends_on:
+    networks:
+      - shared-network
+    environment:
+      - CI=true
+      - LETTR_APP_BASE_URL=http://lettrapp.aliases.containernetwork
+    entrypoint: ["sh"]
+    command:
+      - "-c"
+      - "cd /tests && npm ci && npx playwright test"
+      # - "sleep $((60 * 60 * 24))"
+    stop_grace_period: 1s
+    #entrypoint: ["npm", "init", "&&", "npx", "playwright", "test"]
+    # entrypoint: sh
+    # command:
+    #   - "-c"
+    #   - "sleep $((60 * 60 * 24))"
+
+
+  lettr-app:
+    build: 
+      context: ../../
+      dockerfile: container-images/app/Dockerfile
+    ports:
+      - "8080:80"
+    networks:
+      shared-network:
+        aliases:
+          - lettrapp.aliases.containernetwork
+    environment:
+      - PORT=80
+      - GITHUB_TOKEN=my-secret-token-for-local-dev
+      - IMPRINT_URL=http://www.example.com/imprint
+    stop_grace_period: 1s
+
+volumes:
+  playwright-node-modules:
+
+networks:
+  shared-network:
+    driver: bridge

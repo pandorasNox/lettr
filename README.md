@@ -93,6 +93,7 @@ While any contributions you make are appreciated, please lower and manage your e
     * [ ] more hints
         * [ ] which lttrs are duplicats
         * [ ] give next position of letter which wo do not have one yet
+    * [ ] add tls/https serve capability (enabled e.g. via commandline flags)
     * [ ] move all tests and build etc to container image build and out of github workflow (so we only use the container build in the workflow)
         * reason: making it more ci tool independant / easier to adapt in other ci tools
     * [ ] Circuit Breaker Support
