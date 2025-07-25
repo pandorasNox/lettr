@@ -25,6 +25,8 @@ export default defineConfig({
   reporter: [["html", { open: "never" }]],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
+    strict: true,
+
     /* Base URL to use in actions like `await page.goto('/')`. */
     baseURL: process.env.LETTR_APP_BASE_URL || 'http://localhost:9026',
 

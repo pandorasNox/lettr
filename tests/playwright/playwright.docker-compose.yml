@@ -15,6 +15,7 @@ services:
       - "-c"
       - "cd /tests && npm ci && npx playwright test"
       # - "sleep $((60 * 60 * 24))"
+    stop_grace_period: 1s
     #entrypoint: ["npm", "init", "&&", "npx", "playwright", "test"]
     # entrypoint: sh
     # command:
@@ -36,6 +37,7 @@ services:
       - PORT=80
       - GITHUB_TOKEN=my-secret-token-for-local-dev
       - IMPRINT_URL=http://www.example.com/imprint
+    stop_grace_period: 1s
 
 volumes:
   playwright-node-modules:
