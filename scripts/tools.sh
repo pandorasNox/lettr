@@ -300,7 +300,7 @@ func_playwright_ui() {(
   docker compose \
     --file tests/playwright/playwright.docker-compose.yml \
     --file tests/playwright/playwright-ui-patch.docker-compose.yml \
-    up --build \
+    up --build --force-recreate \
   ;
 )}
 
