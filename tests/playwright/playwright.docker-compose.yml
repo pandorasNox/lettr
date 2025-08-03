@@ -9,7 +9,7 @@ services:
       - shared-network
     environment:
       - CI=true
-      - LETTR_APP_BASE_URL=http://lettrapp.aliases.containernetwork
+      - LETTR_APP_BASE_URL=https://lettrapp.aliases.containernetwork
     entrypoint: ["sh"]
     command:
       - "-c"
@@ -22,7 +22,6 @@ services:
     #   - "-c"
     #   - "sleep $((60 * 60 * 24))"
 
-
   lettr-app:
     build: 
       context: ../../
@@ -30,17 +29,34 @@ services:
     ports:
       - "8080:80"
     networks:
-      shared-network:
-        aliases:
-          - lettrapp.aliases.containernetwork
+      - shared-network
     environment:
       - PORT=80
       - GITHUB_TOKEN=my-secret-token-for-local-dev
       - IMPRINT_URL=http://www.example.com/imprint
     stop_grace_period: 1s
 
+  caddy:
+    image: caddy:2
+    container_name: caddy
+    ports:
+      - "443:443"
+    volumes:
+      - ./../../tests/playwright/Caddyfile:/etc/caddy/Caddyfile
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      - lettr-app
+    networks:
+      shared-network:
+        aliases:
+          - lettrapp.aliases.containernetwork
+    stop_grace_period: 1s
+
 volumes:
   playwright-node-modules:
+  caddy-data:
+  caddy-config:
 
 networks:
   shared-network:

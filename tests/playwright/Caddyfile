@@ -1,0 +1,9 @@
+localhost:443 {
+	tls internal
+	reverse_proxy lettr-app:80
+}
+
+lettrapp.aliases.containernetwork:443 {
+	tls internal
+	reverse_proxy lettr-app:80
+}

@@ -1,6 +1,27 @@
 
 import { test, expect } from '@playwright/test';
 
+// let jsErrors: string[] = [];
+let jsErrors: { console: string[], page: string[]} = { console: [], page: []};
+
+test.beforeEach(async ({ page }) => {
+    jsErrors = { console: [], page: []};
+
+    page.on('console', msg => {
+        if (msg.type() === 'error') {
+            jsErrors.console.push(msg.text());
+        }
+    });
+
+    page.on('pageerror', err => {
+        jsErrors.page.push(err.message);
+    });
+});
+
+test.afterEach(async () => {
+    expect(jsErrors.console, "js console errors should be zero").toHaveLength(0);
+    expect(jsErrors.page, "js page errors should be zero").toHaveLength(0);
+});
 
 // test('solution word from help hint should be successful solve inserted via keyboard press', async ({ page }, testInfo) => {
 test('allows solving the word from help hint via keyboard input', async ({ page }, testInfo) => {
@@ -13,14 +34,6 @@ test('allows solving the word from help hint via keyboard input', async ({ page 
     await expect(page.locator('#theme-toggle')).toBeInViewport();
     await page.locator('#theme-toggle').click();
 
-    // expect game form
-    await page.waitForSelector('form'); // or: await page.locator('form').waitFor()
-    const form = await page.getByRole('form');
-    await expect(form).toHaveCount(1);
-    await form.waitFor({ state: 'visible' }); // OR 'attached' if it's hidden initially
-
-    await expect(form).toHaveCount(1);
-    await expect(form).toBeVisible();
 
     await expect(page.locator('[data-testid="help-btn"]')).toHaveCount(1);
 
@@ -35,7 +48,8 @@ test('allows solving the word from help hint via keyboard input', async ({ page 
 
     await page.locator('[data-testid="back-btn"]').click();
 
-    await expect(page.getByRole('form')).toBeVisible();
+    await page.waitForSelector('form');
+    await expect(page.locator('form')).toBeVisible();
 
     // for (const letter of solution) {
     for (const [i, letter] of Array.from(solution).entries()) {
@@ -44,4 +58,6 @@ test('allows solving the word from help hint via keyboard input', async ({ page 
     }
 
     await page.keyboard.press("Enter");
+    await expect(page.getByRole('heading', { name: 'SOLVED' })).toBeVisible();
+
 });
