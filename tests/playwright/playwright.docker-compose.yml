@@ -4,7 +4,9 @@ services:
     volumes:
       - ./../../tests/playwright:/tests
       - playwright-node-modules:/tests/node_modules
-    # depends_on:
+      - caddy-data:/caddy-data:ro
+    depends_on:
+      - caddy
     networks:
       - shared-network
     environment:

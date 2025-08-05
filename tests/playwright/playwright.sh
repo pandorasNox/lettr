@@ -15,8 +15,8 @@ fi
 # -----------------------------------------------------------------------------
 
 # start app
-docker compose --file tests/playwright/playwright.docker-compose.yml up -d lettr-app
+docker compose --file tests/playwright/playwright.docker-compose.yml up -d lettr-app caddy
 # run tests
 docker compose --file tests/playwright/playwright.docker-compose.yml up playwright
 # shutdown app
-docker compose --file tests/playwright/playwright.docker-compose.yml stop lettr-app
+docker compose --file tests/playwright/playwright.docker-compose.yml stop lettr-app caddy
