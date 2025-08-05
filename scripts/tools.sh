@@ -179,6 +179,12 @@ func_exec_cli() {
 func_down() {
   docker stop -t1 "${CLI_CONTAINER_NAME}" || true # ' || true ' for "No such container: lettr_cli_con" error (ignore if not exists)
   docker compose down
+
+  docker compose --file tests/playwright/playwright.docker-compose.yml down || true;
+  docker compose --file tests/playwright/playwright.docker-compose.yml \
+    --file tests/playwright/playwright-ui-patch.docker-compose.yml down \
+    || true \
+  ;
 }
 
 func_skopeo_cli() {
@@ -293,6 +299,10 @@ func_renovate() {(
   #   --platform=local \
   #   --dry-run=full \
 
+)}
+
+func_playwright() {(
+  ./tests/playwright/playwright.sh;
 )}
 
 func_playwright_ui() {(
@@ -464,9 +474,15 @@ else
       exit 0;
     fi
 
+    if [ "$1" == "playwright" ]
+    then
+      func_playwright;
+      exit 0;
+    fi
+
     if [ "$1" == "playwright-ui" ]
     then
-      func_playwright_ui
+      func_playwright_ui;
       exit 0;
     fi
 

@@ -91,6 +91,10 @@ corpora:
 renovate:
 	./scripts/tools.sh renovate
 
+.PHONY: playwright
+playwright:
+	./scripts/tools.sh playwright
+
 .PHONY: playwright-ui
 playwright-ui:
 	./scripts/tools.sh playwright-ui

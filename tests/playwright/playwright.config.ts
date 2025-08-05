@@ -33,8 +33,11 @@ export default defineConfig({
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
 
-    ignoreHTTPSErrors: process.env.CI ? true : false,
+    // ignoreHTTPSErrors: process.env.CI ? true : false,
   },
+
+  // globalSetup: './global-setup.ts',
+  globalSetup: require.resolve('./global-setup.ts'),
 
   /* Configure projects for major browsers */
   projects: [
