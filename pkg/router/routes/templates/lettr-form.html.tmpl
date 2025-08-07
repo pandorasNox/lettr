@@ -1,7 +1,15 @@
 
 {{ define "lettr-form" }}
   <div class="text-center" id="lettr-container" >
-    <h2 class="text-center">{{ if .IsSolved }}SOLVED{{ else if .IsLoose }}YOU LOOSE{{ else }}unsolved{{ end }}</h2>
+    <h2 class="text-center">
+      {{- if .IsSolved -}}
+        <span data-testid="show-result-solved">SOLVED</span>
+      {{- else if .IsLoose -}}
+        <span data-testid="show-result-loose">YOU LOOSE</span>
+      {{- else -}}
+        <span data-testid="show-result-unsolved">unsolved</span>
+      {{- end -}}
+    </h2>
     <div class="inline-block m-auto">
         <div>
             <div class="mb-1 flex justify-end">

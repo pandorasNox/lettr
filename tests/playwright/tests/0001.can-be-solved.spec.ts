@@ -34,6 +34,10 @@ test('allows solving the word from help hint via keyboard input', async ({ page 
     await expect(page.locator('#theme-toggle')).toBeInViewport();
     await page.locator('#theme-toggle').click();
 
+    // await expect(page.getByRole('heading', { name: 'lettr' })).toBeVisible();
+    // await expect(page.getByRole('heading', { name: 'lettr' })).toHaveText('lettr');
+
+    await expect(page.locator('[data-testid="show-result-unsolved"]')).toBeVisible();
 
     await expect(page.locator('[data-testid="help-btn"]')).toHaveCount(1);
 
@@ -58,6 +62,8 @@ test('allows solving the word from help hint via keyboard input', async ({ page 
     }
 
     await page.keyboard.press("Enter");
-    await expect(page.getByRole('heading', { name: 'SOLVED' })).toBeVisible();
+    // await expect(page.getByRole('heading', { name: 'SOLVED' })).toBeVisible();
+    await expect(page.locator('[data-testid="show-result-unsolved"]')).not.toBeVisible();
+    await expect(page.locator('[data-testid="show-result-solved"]')).toBeVisible();
 
 });
