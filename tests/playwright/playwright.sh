@@ -14,9 +14,18 @@ fi
 
 # -----------------------------------------------------------------------------
 
+func_cleanup() {
+  # Add any cleanup logic here
+  docker compose --file tests/playwright/playwright.docker-compose.yml stop lettr-app caddy
+}
+
+trap 'code=$?; echo "🏁 Script exited with code $code"; echo "🧹 running cleanup"; func_cleanup; exit $code;' EXIT
+
+# -----------------------------------------------------------------------------
+
 # start app
 docker compose --file tests/playwright/playwright.docker-compose.yml up -d lettr-app caddy
 # run tests
-docker compose --file tests/playwright/playwright.docker-compose.yml up playwright
-# shutdown app
-docker compose --file tests/playwright/playwright.docker-compose.yml stop lettr-app caddy
+docker compose --file tests/playwright/playwright.docker-compose.yml up --exit-code-from playwright playwright
+
+# shutdown app (via trap)
