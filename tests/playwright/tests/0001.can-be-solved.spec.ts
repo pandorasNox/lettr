@@ -1,5 +1,6 @@
 
 import { test, expect } from '@playwright/test';
+import { ApplicationPage } from './page.application';
 
 // let jsErrors: string[] = [];
 let jsErrors: { console: string[], page: string[]} = { console: [], page: []};
@@ -29,41 +30,48 @@ test('allows solving the word from help hint via keyboard input', async ({ page 
     console.log('Base URL:', testInfo.project.use?.baseURL);
     await page.goto('/');
 
-    // toggle dark mode
-    await expect(page.locator('#theme-toggle')).toBeVisible();
-    await expect(page.locator('#theme-toggle')).toBeInViewport();
-    await page.locator('#theme-toggle').click();
+    await test.step('toggle dark mode', async () => {
+        const applicaltionPage = new ApplicationPage(page);
+        await applicaltionPage.toggleTheme('dark');
+        expect(applicaltionPage.theme).toBe('dark');
+    });
 
     // await expect(page.getByRole('heading', { name: 'lettr' })).toBeVisible();
     // await expect(page.getByRole('heading', { name: 'lettr' })).toHaveText('lettr');
 
-    await expect(page.locator('[data-testid="show-result-unsolved"]')).toBeVisible();
+    await test.step('solve puzzle', async () => {
+        await expect(page.getByTestId('show-result-unsolved')).toBeVisible();
 
-    await expect(page.locator('[data-testid="help-btn"]')).toHaveCount(1);
+        const solution = await test.step('fetch solution from help', async () => {
+            await expect(page.getByTestId('help-btn')).toHaveCount(1);
 
-    await page.locator('[data-testid="help-btn"]').click();
-    // await page.getByRole('button', { name: '?' }).click();
+            await page.getByTestId('help-btn').click();
+            // await page.getByRole('button', { name: '?' }).click();
 
-    await page.locator('label').filter({ hasText: 'Show solution' }).click()
+            await page.locator('label').filter({ hasText: 'Show solution' }).click()
 
-    const maybeSolution = await page.locator('[data-testid="solution"]').textContent();
-    expect(maybeSolution).not.toBeNull();
-    const solution = maybeSolution as string;
+            const maybeSolution = await page.getByTestId('solution').textContent();
+            expect(maybeSolution).not.toBeNull();
 
-    await page.locator('[data-testid="back-btn"]').click();
+            await page.getByTestId('back-btn').click();
 
-    await page.waitForSelector('form');
-    await expect(page.locator('form')).toBeVisible();
+            return maybeSolution as string;
+        });
 
-    // for (const letter of solution) {
-    for (const [i, letter] of Array.from(solution).entries()) {
-        await page.keyboard.press(letter);
-        await expect(page.locator('input[name="r0"]').nth(i)).toHaveValue(letter);
-    }
+        await test.step('enter solution and solve puzzle', async () => {
+            await page.waitForSelector('form');
+            await expect(page.locator('form')).toBeVisible();
 
-    await page.keyboard.press("Enter");
-    // await expect(page.getByRole('heading', { name: 'SOLVED' })).toBeVisible();
-    await expect(page.locator('[data-testid="show-result-unsolved"]')).not.toBeVisible();
-    await expect(page.locator('[data-testid="show-result-solved"]')).toBeVisible();
+            // for (const letter of solution) {
+            for (const [i, letter] of Array.from(solution).entries()) {
+                await page.keyboard.press(letter);
+                await expect(page.locator('input[name="r0"]').nth(i)).toHaveValue(letter);
+            }
 
+            await page.keyboard.press("Enter");
+            // await expect(page.getByRole('heading', { name: 'SOLVED' })).toBeVisible();
+            await expect(page.getByTestId('show-result-unsolved')).not.toBeVisible();
+            await expect(page.getByTestId('show-result-solved')).toBeVisible();
+        });
+    });
 });
