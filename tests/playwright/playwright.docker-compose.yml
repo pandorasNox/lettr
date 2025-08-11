@@ -13,8 +13,8 @@ services:
       - LETTR_APP_BASE_URL=https://lettrapp.aliases.containernetwork
     entrypoint: ["sh"]
     command:
-      - "-c"
-      - "cd /tests && npm ci && npx playwright test"
+      - "-ceu"
+      - "cd /tests && npm ci && npx tsc -p tsconfig.json --noEmit && npx playwright test"
       # - "sleep $((60 * 60 * 24))"
     stop_grace_period: 1s
     #entrypoint: ["npm", "init", "&&", "npx", "playwright", "test"]
