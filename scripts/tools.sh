@@ -280,7 +280,7 @@ func_shellcheck_fix() {(
 func_renovate() {(
 
   # renovate: datasource=docker
-  CONTAINER_IMAGE=docker.io/renovate/renovate:41.37.11@sha256:1f96a55a5795ae5f1d8ed71923122b19dc50257f9c74b9a1b7b6ffc8465c8ac0;
+  CONTAINER_IMAGE=docker.io/renovate/renovate:41.66.2@sha256:d9965278f5bb202c67e20507aa118665657287a4c1e46fd00d51891ae97a21af;
 
   # note:
   #   * in regards to --platform=local
