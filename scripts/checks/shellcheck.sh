@@ -27,7 +27,7 @@ done
 # -----------------------------------------------------------------------------
 
 # renovate: datasource=docker
-SHELLCHECK_CONTAINER_IMAGE=docker.io/koalaman/shellcheck-alpine:v0.10.0@sha256:5921d946dac740cbeec2fb1c898747b6105e585130cc7f0602eec9a10f7ddb63;
+SHELLCHECK_CONTAINER_IMAGE=docker.io/koalaman/shellcheck-alpine:v0.11.0@sha256:9955be09ea7f0dbf7ae942ac1f2094355bb30d96fffba0ec09f5432207544002;
 
 # -----------------------------------------------------------------------------
 
