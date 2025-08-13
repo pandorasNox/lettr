@@ -12,9 +12,9 @@
   "author": "",
   "license": "Apache-2.0",
   "devDependencies": {
-    "@eslint/js": "9.31.0",
+    "@eslint/js": "9.33.0",
     "esbuild": "0.25.9",
-    "eslint": "9.31.0",
+    "eslint": "9.33.0",
     "globals": "16.3.0",
     "tailwindcss": "4.1.11",
     "typescript": "5.9.2",
