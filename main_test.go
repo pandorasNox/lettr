@@ -2,10 +2,13 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	iofs "io/fs"
 	"log"
 	"net/http"
 	"os"
+	"os/exec"
+	"runtime"
 	"slices"
 	"strings"
 	"syscall"
@@ -14,6 +17,38 @@ import (
 
 	"github.com/pandorasNox/lettr/pkg/session"
 )
+
+func TestGoVersionMatchesGoMod(t *testing.T) {
+	// Get runtime version (e.g., "go1.21.3")
+	runtimeVersion := strings.TrimPrefix(runtime.Version(), "go")
+	runtimeMajorMinor := majorMinorPatch(runtimeVersion)
+
+	// Get go.mod version using `go mod edit -json`
+	cmd := exec.Command("go", "mod", "edit", "-json")
+	out, err := cmd.Output()
+	if err != nil {
+		t.Fatalf("Failed to run `go mod edit -json`: %v", err)
+	}
+
+	var mod struct {
+		Go string
+	}
+	if err := json.Unmarshal(out, &mod); err != nil {
+		t.Fatalf("Failed to parse go.mod JSON: %v", err)
+	}
+
+	if runtimeMajorMinor != mod.Go {
+		t.Errorf("Go version mismatch: runtime is %s, go.mod declares %s", runtimeMajorMinor, mod.Go)
+	}
+}
+
+func majorMinorPatch(version string) string {
+	parts := strings.Split(version, ".")
+	if len(parts) < 2 {
+		return version
+	}
+	return parts[0] + "." + parts[1] + "." + parts[2]
+}
 
 // todo: test for ???:
 //   files, err := getAllFilenames(staticFS)
