@@ -7,7 +7,15 @@
   ],
   "configMigration": true,
   "pinDigests": true,
+  "lockFileMaintenance": {
+    "enabled": true,
+    "automerge": true
+  },
   "packageRules": [
+    {
+      "matchUpdateTypes": ["digest"],
+      "automerge": true
+    },
     {
       "matchDatasources": [
         "golang-version"
