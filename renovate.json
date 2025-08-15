@@ -13,7 +13,7 @@
   },
   "packageRules": [
     {
-      "matchUpdateTypes": ["digest"],
+      "matchUpdateTypes": ["digest", "patch"],
       "automerge": true
     },
     {
