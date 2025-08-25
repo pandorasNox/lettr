@@ -190,7 +190,7 @@ func_down() {
 
 func_skopeo_cli() {
   # renovate: datasource=docker
-  SKOPEO_CONTAINER_IMAGE=quay.io/skopeo/stable:v1.19.0@sha256:b64a021295205b514633c8192995f5445685ba0bc8e32a581ef9da41b3ef8ca9;
+  SKOPEO_CONTAINER_IMAGE=quay.io/skopeo/stable:v1.19.0@sha256:ab3a52030c1eef0d5be0844c0892536f52f851f1aa93f63ba345cadc6c1b90eb;
   docker run -it --rm --entrypoint=bash "${SKOPEO_CONTAINER_IMAGE}"
 }
 
