@@ -241,7 +241,7 @@ func_golangci_lint() {(
   echo "run golangci-lint";
 
   # renovate: datasource=docker
-  GOLANGCI_LINT_CONTAINER_IMAGE=golangci/golangci-lint:v2.4.0-alpine@sha256:a93d021e12afdb31b11a3d2dab39cfc45b2ec950977029ffed636e2098cb784c;
+  GOLANGCI_LINT_CONTAINER_IMAGE=golangci/golangci-lint:v2.8.0-alpine@sha256:1194f3bfcbaeeb92d8d159fdfbe2a79d18ec0a222d9d984b1438906bca416b51;
 
   _fix=false
   # handle flags, see https://stackoverflow.com/a/22395652
