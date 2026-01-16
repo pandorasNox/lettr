@@ -12,7 +12,7 @@ services:
       - ./tmp:/tmp/dumps
 
   adminer:
-    image: adminer:5.3.0@sha256:2b845b0e8e89245afd5bce48c20f3348581021492a64667a2c38a8e7e1096c46
+    image: adminer:5.4.1@sha256:d7df936c1b3f2aad9e3283f029a6da2bfd5f0406aed2f0c13d589502b0f03ee4
     restart: always
     ports:
       - 8066:8080
