@@ -5,7 +5,7 @@ go 1.24.4
 require github.com/google/uuid v1.6.0
 
 require (
-	github.com/agiledragon/gomonkey/v2 v2.13.0
+	github.com/agiledragon/gomonkey/v2 v2.14.0
 	github.com/google/go-github/v74 v74.0.0
 	github.com/microcosm-cc/bluemonday v1.0.27
 	github.com/prometheus/client_golang v1.23.2
