@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>lettr — Option 1: Card Grid</title>
+  <title>lettr — Option 6: Combined</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -41,10 +41,26 @@
 
   <!-- Main -->
   <main class="flex-1 flex flex-col items-center justify-center px-4 py-16">
-    <h2 class="mb-2 text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white">lettr</h2>
-    <p class="mb-12 text-lg font-normal text-gray-500 dark:text-gray-400">Choose your game mode</p>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl w-full">
+    <!-- Text block (from option 3) -->
+    <div class="max-w-2xl text-center mb-12">
+      <h2 class="mb-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-gray-900 dark:text-white">lettr</h2>
+      <p class="mb-4 text-xl font-normal text-gray-600 dark:text-gray-300 leading-relaxed">
+        Word guessing
+      </p>
+      <p class="text-lg font-normal text-gray-500 dark:text-gray-400 leading-relaxed">
+        Made simple. No ads, no accounts, no distractions. Play as many rounds as you like — no waiting for tomorrow.
+      </p>
+      <div class="mt-8 flex flex-wrap gap-2 justify-center">
+        <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300">Endless play</span>
+        <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-blue-900 dark:text-blue-300">English &amp; German</span>
+        <span class="bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-purple-900 dark:text-purple-300">No sign-up</span>
+        <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-gray-700 dark:text-gray-300">Open source</span>
+      </div>
+    </div>
+
+    <!-- Game modes: big cards on desktop (from option 1) -->
+    <div class="hidden md:grid grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl w-full">
 
       <!-- Classic Card -->
       <div class="flex flex-col items-center text-center p-6 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
@@ -53,13 +69,13 @@
         </div>
         <h3 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Classic</h3>
         <p class="mb-5 font-normal text-gray-700 dark:text-gray-400">Guess the 5-letter word in 6 tries</p>
-        <a href="#" class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-center text-white bg-green-700 rounded-lg hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
+        <a href="#" class="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-sm inline-flex items-center px-5 py-2.5 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700">
           Play
           <svg class="w-3.5 h-3.5 ms-2 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9"/></svg>
         </a>
       </div>
 
-      <!-- Coming Soon Card -->
+      <!-- Anagram Card -->
       <div class="flex flex-col items-center text-center p-6 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
         <div class="w-14 h-14 mb-4 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center">
           <svg class="w-7 h-7 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
@@ -69,7 +85,7 @@
         <span class="bg-gray-100 text-gray-500 text-xs font-medium px-2.5 py-1 rounded-full dark:bg-gray-700 dark:text-gray-400">Coming soon</span>
       </div>
 
-      <!-- Coming Soon Card -->
+      <!-- Speed Run Card -->
       <div class="flex flex-col items-center text-center p-6 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
         <div class="w-14 h-14 mb-4 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center">
           <svg class="w-7 h-7 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
@@ -77,6 +93,47 @@
         <h3 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Speed Run</h3>
         <p class="mb-5 font-normal text-gray-700 dark:text-gray-400">Race against the clock</p>
         <span class="bg-gray-100 text-gray-500 text-xs font-medium px-2.5 py-1 rounded-full dark:bg-gray-700 dark:text-gray-400">Coming soon</span>
+      </div>
+
+    </div>
+
+    <!-- Game modes: compact list cards on mobile (from option 3) -->
+    <div class="md:hidden space-y-3 w-full max-w-md">
+
+      <!-- Classic -->
+      <a href="#" class="flex items-center gap-4 p-5 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700 transition-colors group">
+        <div class="w-12 h-12 shrink-0 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center">
+          <svg class="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        </div>
+        <div class="flex-1">
+          <h4 class="text-lg font-bold tracking-tight text-gray-900 dark:text-white">Classic</h4>
+          <p class="text-sm font-normal text-gray-500 dark:text-gray-400">Guess the 5-letter word in 6 tries</p>
+        </div>
+        <svg class="w-5 h-5 text-gray-400 group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12l-7.5 7.5"/></svg>
+      </a>
+
+      <!-- Anagram -->
+      <div class="flex items-center gap-4 p-5 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700 opacity-60">
+        <div class="w-12 h-12 shrink-0 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center">
+          <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+        </div>
+        <div class="flex-1">
+          <h4 class="text-lg font-bold tracking-tight text-gray-900 dark:text-white">Anagram</h4>
+          <p class="text-sm font-normal text-gray-500 dark:text-gray-400">Unscramble the letters to form words</p>
+        </div>
+        <span class="bg-gray-100 text-gray-500 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-gray-700 dark:text-gray-400">Soon</span>
+      </div>
+
+      <!-- Speed Run -->
+      <div class="flex items-center gap-4 p-5 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700 opacity-60">
+        <div class="w-12 h-12 shrink-0 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center">
+          <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+        </div>
+        <div class="flex-1">
+          <h4 class="text-lg font-bold tracking-tight text-gray-900 dark:text-white">Speed Run</h4>
+          <p class="text-sm font-normal text-gray-500 dark:text-gray-400">Race against the clock</p>
+        </div>
+        <span class="bg-gray-100 text-gray-500 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-gray-700 dark:text-gray-400">Soon</span>
       </div>
 
     </div>
