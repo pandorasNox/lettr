@@ -4,6 +4,13 @@
 
 Replace the current `/` route (which serves the game directly) with a new landing page.
 The game moves to a **mode-scoped URL**: `/game/lettr`.
+Henceforth, the goal is not to implement the new Pooplr game, the goal is to prepare the playing field so that we are able to implement more game modes in the future.
+
+## Out of scope
+
+- Putting game modes into their own sub module + sub directory. For this work everything stays in
+  `pkg/router/routes/` (handlers, models, templates) as described by the naming scheme below;
+  splitting the modes into separate packages is part of an upcoming ticket.
 
 ## Naming scheme
 
