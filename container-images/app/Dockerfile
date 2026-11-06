@@ -80,7 +80,7 @@ RUN go test -v ./...
 
 # =============================================================
 
-FROM alpine:3.23@sha256:fd791d74b68913cbb027c6546007b3f0d3bc45125f797758156952bc2d6daf40 AS prod
+FROM alpine:3.24@sha256:3f4d6b32e26703c6082839234f43769d5046b3ac7c910033911d1e71d8cd630a AS prod
 
 COPY --from=builder-and-dev /tmp/lettr /usr/local/bin/
 
